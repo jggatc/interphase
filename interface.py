@@ -845,6 +845,7 @@ class Interface(pygame.sprite.Sprite):
         width, height = control.display.check_size('x')
         pos = ( control.position[0]+(size[0]//2), control.position[1]+(size[1]//2)-(height//2) )
         control.display.set_position((pos),center=True)
+        control.text_image = {}
         pos = ( control.position[0]+(size[0]//2), control.position[1]-(control.font_size+3) )
         control.label.set_position((pos),center=True)
         self._update_panel = True

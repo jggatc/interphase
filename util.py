@@ -87,6 +87,7 @@ class Text(object):
         self.linesize = self.font[self.font_size].get_linesize()
         self.margin = {'t':0, 'r':0, 'b':0, 'l':0}
         self.multiline = False
+        self.text_surface = []
 
     def __call__(self, surface='default'):
         """Writes text to surface."""
@@ -299,57 +300,66 @@ class Text(object):
     def tprint(self):
         """Print text to surface."""
         if self.messages != []:
+            self.text_surface = []
             if not self.multiline:
                 text = " ".join(self.messages)
                 if not self.split_text or text.strip().count(' ') == 0:
                     if self.font_bgcolor:
-                        self.text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)
+                        text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)
                     else:
-                        self.text_surface = self.font[self.font_size].render(text, True, self.font_color)
+                        text_surface = self.font[self.font_size].render(text, True, self.font_color)
                     if self.center:
-                        center = self.text_surface.get_width()//2
+                        center = text_surface.get_width()//2
                         x = self.x - center
                     else:
                         x = self.x + self.margin['l']
-                    text_rect = self.text_surface.get_rect()
-                    self.surface.blit(self.text_surface, (x,self.y))
+                    w, h = text_surface.get_size()
+                    text_rect = pygame.Rect(x,self.y,w,h)
+                    self.text_surface.append( (text_surface, text_rect) )
+                    self.surface.blit(text_surface, (x,self.y))
                 else:
                     words = text.count(' ')
                     position_y = self.y - words*(self.linesize//2) - 1
                     texts = text.split(' ')
                     for count, text in enumerate(texts):
                         if self.font_bgcolor:
-                            self.text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)
+                            text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)
                         else:
-                            self.text_surface = self.font[self.font_size].render(text, True, self.font_color)
+                            text_surface = self.font[self.font_size].render(text, True, self.font_color)
                         if self.center:
-                            center = self.text_surface.get_width()//2
+                            center = text_surface.get_width()//2
                             x = self.x - center
                             y = position_y + (count*self.linesize)
                         else:
                             x = self.x
                             y = position_y + (count*self.linesize)
-                        text_rect = self.text_surface.get_rect()
-                        self.surface.blit(self.text_surface, (x,y))
+                        w, h = text_surface.get_size()
+                        text_rect = pygame.Rect(x,y,w,h)
+                        self.text_surface.append( (text_surface, text_rect) )
+                    for surface in self.text_surface:
+                        self.surface.blit(surface[0], (surface[1].x,surface[1].y))
             else:
                 position_y = self.y + self.margin['t']
                 for count, text in enumerate(self.messages):
                     if self.font_bgcolor:
-                        self.text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)
+                        text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)
                     else:
-                        self.text_surface = self.font[self.font_size].render(text, True, self.font_color)
+                        text_surface = self.font[self.font_size].render(text, True, self.font_color)
                     if self.center:
-                        center = self.text_surface.get_width()//2
+                        center = text_surface.get_width()//2
                         x = self.x - center
                         y = position_y + (count*self.linesize)
                     else:
                         x = self.x + self.margin['l']
                         y = position_y + (count*self.linesize)
-                    text_rect = self.text_surface.get_rect()
-                    self.surface.blit(self.text_surface, (x,y))
+                    w, h = text_surface.get_size()
+                    text_rect = pygame.Rect(x,y,w,h)
+                    self.text_surface.append( (text_surface, text_rect) )
+                for surface in self.text_surface:
+                    self.surface.blit(surface[0], (surface[1].x,surface[1].y))
             self.message = None
             self.messages = []
-            return text_rect
+            return self.text_surface
 
     def update(self):
         self.tprint()
