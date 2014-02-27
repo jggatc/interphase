@@ -46,29 +46,21 @@ Control Object methods:
 get_value, set_value, get_list, set_list, remove_list, set_list_icon, set_control_image, set_link, set_link_activated, set_activated, is_activated, set_activated_lock, is_activated_lock, set_active, is_active, next, previous, reset, get_position, set_display_text, set_label_text, get_tip, set_tip, get_id, set_label, get_label, resize_control, set_enabled, is_enabled, get_size, set_color, get_list_index, set_list_index, add_action, format_text, add_format, set_scroll_line, text_copy, text_paste, set_line_max, get_line_max, set_line_width, get_line_width, get_text, get_display_text, set_text_margin, get_text_margin, check_size.
 """
 
-#Interphase
+#Interphase - Pygame Interface Module
 #Copyright (C) 2009 James Garnon
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+#This library is free software; you can redistribute it and/or
+#modify it under the terms of the GNU Lesser General Public
+#License as published by the Free Software Foundation; either
+#version 2.1 of the License, or (at your option) any later version.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#This library is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+#Lesser General Public License for more details.
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-#Interphase version 0.84
-#Download Site: http://gatc.ca
-#
-#Dependencies:
-#
-#    Python 2.5:   http://www.python.org/
-#    Pygame 1.8:   http://www.pygame.org/
+#You should have received a copy of the GNU Lesser General Public License
+#along with this library; if not, see http://www.gnu.org/licenses/.
 
 __docformat__ = 'restructuredtext'
 

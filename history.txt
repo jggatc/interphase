@@ -122,3 +122,8 @@ InterfaceControl Class changes:
 -updated Interface.set_label_display and Interface.panel_update to ensure panel update.
 -updated Text.tprint to adjust text position.
 
+0.86    February 27, 2014
+-updated Text.tprint multiline print on background color.
+-updated Control to cache rendered text.
+-changed license from GPL to LGPL.
+
