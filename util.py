@@ -315,7 +315,7 @@ class Text(object):
                     self.surface.blit(self.text_surface, (x,self.y))
                 else:
                     words = text.count(' ')
-                    position_y = self.y - words*(self.linesize//2) - 1      #0.85
+                    position_y = self.y - words*(self.linesize//2) - 1
                     texts = text.split(' ')
                     for count, text in enumerate(texts):
                         if self.font_bgcolor:
@@ -335,7 +335,7 @@ class Text(object):
                 position_y = self.y + self.margin['t']
                 for count, text in enumerate(self.messages):
                     if self.font_bgcolor:
-                        self.text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)    ###0.86
+                        self.text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)
                     else:
                         self.text_surface = self.font[self.font_size].render(text, True, self.font_color)
                     if self.center:

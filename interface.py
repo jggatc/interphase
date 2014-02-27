@@ -713,11 +713,11 @@ class Interface(pygame.sprite.Sprite):
         """Set label display setting."""
         if setting == 'Toggle':
             self._label_display = not self._label_display
-            self._update_panel = True   #0.85
+            self._update_panel = True
             return self._label_display
         elif setting in (True, False):
             self._label_display = setting
-            self._update_panel = True   #0.85
+            self._update_panel = True
             return self._label_display
         else:
             return None
@@ -1135,8 +1135,8 @@ class Interface(pygame.sprite.Sprite):
             if control_select:
                 button_select, value = self._control_action(control_select, button_select)
             else:
-                button_select, value = None, None     #0.85
-            self._update_panel = True   #0.85
+                button_select, value = None, None
+            self._update_panel = True
         self._clock.tick()
         if force_update:
             self._update_panel = True
@@ -1155,7 +1155,7 @@ class Interface(pygame.sprite.Sprite):
                 self._interface['state'] = InterfaceState(panel)
                 self._interface['update'] = False
             self._interface['state'].panel_interact = self._panel_interact
-        try:    #0.85
+        try:
             try:
                 if self._controls[control_select].event:
                     pygame.event.post(self._events['controlselect'])
