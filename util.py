@@ -335,7 +335,7 @@ class Text(object):
                 position_y = self.y + self.margin['t']
                 for count, text in enumerate(self.messages):
                     if self.font_bgcolor:
-                        self.text_surface = self.font[self.font_size].render(line, True, self.font_color, self.font_bgcolor)
+                        self.text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)    ###0.86
                     else:
                         self.text_surface = self.font[self.font_size].render(text, True, self.font_color)
                     if self.center:
