@@ -23,6 +23,7 @@ class Text(object):
     """
 
     _font = {}
+    _cache = {}
 
     def __init__(self, surface, font_type=None, font_size=None):
         self.screen = surface
@@ -87,7 +88,8 @@ class Text(object):
         self.linesize = self.font[self.font_size].get_linesize()
         self.margin = {'t':0, 'r':0, 'b':0, 'l':0}
         self.multiline = False
-        self.text_surface = []
+        self.cache = None
+        self.cache_key = None
 
     def __call__(self, surface='default'):
         """Writes text to surface."""
@@ -160,6 +162,7 @@ class Text(object):
                     Text._font['default'] = font
                     Text._font['defaults'] = font_type
         self.linesize = self.font[self.font_size].get_linesize()
+        self.cache = None
 
     def get_font(self, font_info='font'):
         """Get current font."""
@@ -181,14 +184,17 @@ class Text(object):
             Text._font[self.font_type][self.font_size] = pygame.font.Font(self.font_type,self.font_size)
         self.font = Text._font[self.font_type]
         self.linesize = self.font[self.font_size].get_linesize()
+        self.cache = None
 
     def set_font_color(self, color):
         """Set font color of text."""
         self.font_color = color
+        self.cache = None
 
     def set_font_bgcolor(self, color=None):
         """Set font background color."""
         self.font_bgcolor = color
+        self.cache = None
 
     def set_split_text(self, split_text=True):
         """Set whether text split to new line at space."""
@@ -297,69 +303,86 @@ class Text(object):
         self.message = None
         self.messages = []
 
+    def _cache_chr(self, ch):
+        if self.font_bgcolor:
+            text_surface = self.font[self.font_size].render(ch, True, self.font_color, self.font_bgcolor)
+        else:
+            text_surface = self.font[self.font_size].render(ch, True, self.font_color)
+        try:
+            self.cache[ch] = {'image':text_surface, 'width':text_surface.get_width()}
+        except TypeError:
+            self.cache_key = self.font_type + str(self.font_size) + str(self.font_color) + str(self.font_bgcolor)
+            if self.cache_key not in self._cache:
+                self._cache[self.cache_key] = {}
+            self.cache = self._cache[self.cache_key]
+            self.cache[ch] = {'image':text_surface, 'width':text_surface.get_width()}
+
+    def _get_width(self, text):
+        width = 0
+        for ch in text:
+            try:
+                width += self.cache[ch]['width']
+            except (KeyError, TypeError):
+                self._cache_chr(ch)
+                width += self.cache[ch]['width']
+        return width
+
     def tprint(self):
         """Print text to surface."""
         if self.messages != []:
-            self.text_surface = []
             if not self.multiline:
                 text = " ".join(self.messages)
                 if not self.split_text or text.strip().count(' ') == 0:
-                    if self.font_bgcolor:
-                        text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)
-                    else:
-                        text_surface = self.font[self.font_size].render(text, True, self.font_color)
                     if self.center:
-                        center = text_surface.get_width()//2
-                        x = self.x - center
+                        width = self._get_width(text)
+                        x = self.x - (width//2)
                     else:
                         x = self.x + self.margin['l']
-                    w, h = text_surface.get_size()
-                    text_rect = pygame.Rect(x,self.y,w,h)
-                    self.text_surface.append( (text_surface, text_rect) )
-                    self.surface.blit(text_surface, (x,self.y))
+                    for ch in text:
+                        try:
+                            self.surface.blit(self.cache[ch]['image'], (x,self.y))
+                        except (KeyError, TypeError):
+                            self._cache_chr(ch)
+                            self.surface.blit(self.cache[ch]['image'], (x,self.y))
+                        x += self.cache[ch]['width']
                 else:
                     words = text.count(' ')
                     position_y = self.y - words*(self.linesize//2) - 1
                     texts = text.split(' ')
                     for count, text in enumerate(texts):
-                        if self.font_bgcolor:
-                            text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)
-                        else:
-                            text_surface = self.font[self.font_size].render(text, True, self.font_color)
                         if self.center:
-                            center = text_surface.get_width()//2
-                            x = self.x - center
+                            width = self._get_width(text)
+                            x = self.x - (width//2)
                             y = position_y + (count*self.linesize)
                         else:
                             x = self.x
                             y = position_y + (count*self.linesize)
-                        w, h = text_surface.get_size()
-                        text_rect = pygame.Rect(x,y,w,h)
-                        self.text_surface.append( (text_surface, text_rect) )
-                    for surface in self.text_surface:
-                        self.surface.blit(surface[0], (surface[1].x,surface[1].y))
+                        for ch in text:
+                            try:
+                                self.surface.blit(self.cache[ch]['image'], (x,y))
+                            except (KeyError, TypeError):
+                                self._cache_chr(ch)
+                                self.surface.blit(self.cache[ch]['image'], (x,y))
+                            x += self.cache[ch]['width']
             else:
                 position_y = self.y + self.margin['t']
                 for count, text in enumerate(self.messages):
-                    if self.font_bgcolor:
-                        text_surface = self.font[self.font_size].render(text, True, self.font_color, self.font_bgcolor)
-                    else:
-                        text_surface = self.font[self.font_size].render(text, True, self.font_color)
                     if self.center:
-                        center = text_surface.get_width()//2
-                        x = self.x - center
+                        width = self._get_width(text)
+                        x = self.x - (width//2)
                         y = position_y + (count*self.linesize)
                     else:
                         x = self.x + self.margin['l']
                         y = position_y + (count*self.linesize)
-                    w, h = text_surface.get_size()
-                    text_rect = pygame.Rect(x,y,w,h)
-                    self.text_surface.append( (text_surface, text_rect) )
-                for surface in self.text_surface:
-                    self.surface.blit(surface[0], (surface[1].x,surface[1].y))
+                    for ch in text:
+                        try:
+                            self.surface.blit(self.cache[ch]['image'], (x,y))
+                        except (KeyError, TypeError):
+                            self._cache_chr(ch)
+                            self.surface.blit(self.cache[ch]['image'], (x,y))
+                        x += self.cache[ch]['width']
             self.message = None
             self.messages = []
-            return self.text_surface
 
     def update(self):
         self.tprint()

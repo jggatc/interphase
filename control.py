@@ -318,13 +318,8 @@ class Control(object):
             return image
         try:
             if self.list_type.startswith('__') or not self.value.startswith('__'):
-                try:
-                    for img in self.text_image[self.value]:
-                        image.blit(img[0],(img[1].x,img[1].y))
-                except KeyError:
-                    self.display.add(self.value)
-                    image = self.display(image)
-                    self.text_image[self.value] = self.display.text_surface
+                self.display.add(self.value)
+                image = self.display(image)
             else:
                 if self.control_icon:
                     try:

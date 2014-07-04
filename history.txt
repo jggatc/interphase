@@ -127,3 +127,6 @@ InterfaceControl Class changes:
 -updated Control to cache rendered text.
 -changed license from GPL to LGPL.
 
+0.87_git
+-update Text.tprint to use rendered character cache.
+
