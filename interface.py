@@ -10,9 +10,9 @@ try:
     from image import _image_decode
 except ImportError:
     pass
-import pygame
 import os
 import zipfile
+from env import engine
 
 __docformat__ = 'restructuredtext'
 
@@ -23,7 +23,7 @@ __docformat__ = 'restructuredtext'
 EVENT = {'controlselect':30, 'controlinteract':31}
 
 
-class Interface(pygame.sprite.Sprite):
+class Interface(engine.sprite.Sprite):
     """
     **Interface Object**
 
@@ -134,8 +134,8 @@ class Interface(pygame.sprite.Sprite):
         text_paste: bool clipboard support <False>.
         event: bool interaction generates events <False>.
         """
-        pygame.sprite.Sprite.__init__(self)
-        self._panel = pygame.sprite.RenderUpdates(self)
+        engine.sprite.Sprite.__init__(self)
+        self._panel = engine.sprite.RenderUpdates(self)
         self._text = Text
         self._load_image = load_image
         self._data = data_folder
@@ -198,7 +198,7 @@ class Interface(pygame.sprite.Sprite):
         self._active = True
         self._panel_active = False
         self._panel_display = True     #panel controls display on or toggled with pointer interact
-        self._panel_rect = pygame.Rect(self.rect)
+        self._panel_rect = engine.Rect(self.rect)
         self._font_color = font_color
         self._font_type = font_type
         self._font_size = font_size
@@ -228,7 +228,7 @@ class Interface(pygame.sprite.Sprite):
         self._control_move = None   #control selected to move
         self._pointer_position = (0,0)
         self._pointer_interact = pointer_interact   #detect control hover
-        self._clock = pygame.time.Clock()
+        self._clock = engine.time.Clock()
         self._update_panel = True   #set for panel update
         self._initial_update = 10   #panel updates for short duration
         self._panel_function = []   #list of panel functions to run on panel update
@@ -237,8 +237,8 @@ class Interface(pygame.sprite.Sprite):
         self._interface = {'state':None, 'update':False}    #interface control state
         self._event = event
         self._events = {}
-        self._events['controlselect'] = pygame.event.Event(EVENT['controlselect'], self._interface)
-        self._events['controlinteract'] = pygame.event.Event(EVENT['controlinteract'], self._interface)
+        self._events['controlselect'] = engine.event.Event(EVENT['controlselect'], self._interface)
+        self._events['controlinteract'] = engine.event.Event(EVENT['controlinteract'], self._interface)
         self.add_controls()
         self.activate()
 
@@ -477,7 +477,7 @@ class Interface(pygame.sprite.Sprite):
         if not image:
             self._panel_image = Interface._image_default['panel_image'].copy()
             if self._panel_image.get_size() != self._size:
-                self._panel_image = pygame.transform.smoothscale(self._panel_image, self._size)
+                self._panel_image = engine.transform.smoothscale(self._panel_image, self._size)
             self.image = self._panel_image.copy()
             self.rect = self.image.get_rect(center=(self._x,self._y))
         if not control_image:
@@ -501,18 +501,18 @@ class Interface(pygame.sprite.Sprite):
                 data_folder, data_zip, color_key = self._data_source(data_folder, data_zip, color_key, file_obj)
                 self._panel_image = self._load_image(image[0], path=data_folder, zipobj=data_zip, fileobj=file_obj, colorkey=color_key)
                 if self._panel_image.get_size() != self._size:
-                    self._panel_image = pygame.transform.smoothscale(self._panel_image, self._size)
+                    self._panel_image = engine.transform.smoothscale(self._panel_image, self._size)
             else:
-                self._panel_image = pygame.Surface(self._size)
+                self._panel_image = engine.Surface(self._size)
                 self._panel_image.fill(self._color)
         elif surface:
             self._panel_image = surface.copy()
             if color_key:
                 if color_key is -1:
                     color_key = self._panel_image.get_at((0,0))
-                self._panel_image.set_colorkey(color_key, pygame.RLEACCEL)
+                self._panel_image.set_colorkey(color_key, engine.RLEACCEL)
             if self._panel_image.get_size() != self._size:
-                self._panel_image = pygame.transform.smoothscale(self._panel_image, self._size) 
+                self._panel_image = engine.transform.smoothscale(self._panel_image, self._size) 
         else:
             self._panel_image = Interface._image_default['panel_image'].copy()
         self.image = self._panel_image.copy()
@@ -537,7 +537,7 @@ class Interface(pygame.sprite.Sprite):
             if color_key:
                 if color_key is -1:
                     color_key = self._control_image['bg'].get_at((0,0))
-                self._control_image['bg'].set_colorkey(color_key, pygame.RLEACCEL)
+                self._control_image['bg'].set_colorkey(color_key, engine.RLEACCEL)
         else:
             try:
                 self._control_image['bg'] = Interface._image_default['control_image']['bg'].copy()
@@ -567,12 +567,12 @@ class Interface(pygame.sprite.Sprite):
                 button_frames = 2
                 if len(button_image) == 1:
                     images = self._load_image(button_image[0], button_frames, path=data_folder, zipobj=data_zip, fileobj=file_obj, colorkey=color_key)
-                    self._button_image['t'] = pygame.transform.smoothscale(images[0], self._button_size)
-                    self._button_image['b'] = pygame.transform.smoothscale(images[1], self._button_size)
+                    self._button_image['t'] = engine.transform.smoothscale(images[0], self._button_size)
+                    self._button_image['b'] = engine.transform.smoothscale(images[1], self._button_size)
                 else:
                     for num, frame in enumerate(['t','b']):
                         img = self._load_image(button_image[num], path=data_folder, zipobj=data_zip, fileobj=file_obj, colorkey=color_key)
-                        self._button_image[frame] = pygame.transform.smoothscale(img, self._button_size)
+                        self._button_image[frame] = engine.transform.smoothscale(img, self._button_size)
             else:
                 self._button_image = {}
         elif surface:
@@ -581,8 +581,8 @@ class Interface(pygame.sprite.Sprite):
                 if color_key:
                     if color_key is -1:
                         color_key = img.get_at((0,0))
-                    img.set_colorkey(color_key, pygame.RLEACCEL)
-                self._button_image[frame] = pygame.transform.smoothscale(img, self._button_size)
+                    img.set_colorkey(color_key, engine.RLEACCEL)
+                self._button_image[frame] = engine.transform.smoothscale(img, self._button_size)
         else:
             self._button_image = Interface._image_default['button_image'].copy()
         if self._initialized:
@@ -855,10 +855,10 @@ class Interface(pygame.sprite.Sprite):
         if control:
             self._control_move = control
             if not mouse_visible:
-                pygame.mouse.set_visible(False)
+                engine.mouse.set_visible(False)
         else:
             self._control_move = None
-            pygame.mouse.set_visible(True)
+            engine.mouse.set_visible(True)
 
     def get_control_move(self):
         """Return selected control to move."""
@@ -1030,7 +1030,7 @@ class Interface(pygame.sprite.Sprite):
 
     def _panel_interaction(self):
         """Check for mouse interaction with panel."""
-        self._pointer_position = pygame.mouse.get_pos()
+        self._pointer_position = engine.mouse.get_pos()
         if self._displayed:
             if not self.rect.collidepoint(self._pointer_position):
                 self._panel_interact = False
@@ -1073,7 +1073,7 @@ class Interface(pygame.sprite.Sprite):
         """Check control selected."""
         if not self._displayed or not self._panel_active or self._panel_disabled:
             return None, None
-        button1 = pygame.mouse.get_pressed()[0]
+        button1 = engine.mouse.get_pressed()[0]
         if not button1:
             self._control_press['control'] = None
             return None, None
@@ -1097,13 +1097,13 @@ class Interface(pygame.sprite.Sprite):
                         else:
                             self._control_press['response'] = self._control_press['control'].control_response
                             control_select, button_select = control, button
-                        self._control_press['rtime'] = self._control_press['htime'] = pygame.time.get_ticks()
+                        self._control_press['rtime'] = self._control_press['htime'] = engine.time.get_ticks()
                         return control_select, button_select
         else:
             if (self._control_press['control'].rects[self._control_press['button']].collidepoint(pos)) and (self._control_press['control'].active):
-                time = pygame.time.get_ticks()
+                time = engine.time.get_ticks()
                 if (time-self._control_press['rtime']) > self._control_press['response']:
-                    self._control_press['rtime'] = pygame.time.get_ticks()
+                    self._control_press['rtime'] = engine.time.get_ticks()
                     control_select = self._control_press['control'].id
                     button_select = self._control_press['button']
                     if not self._control_press['hold'] or (time-self._control_press['htime']) < self._control_press['hold']:
@@ -1159,12 +1159,12 @@ class Interface(pygame.sprite.Sprite):
         try:
             try:
                 if self._controls[control_select].event:
-                    pygame.event.post(self._events['controlselect'])
+                    engine.event.post(self._events['controlselect'])
             except KeyError:
                 pass
             try:
                 if self._controls[control_interact].event:
-                    pygame.event.post(self._events['controlinteract'])
+                    engine.event.post(self._events['controlinteract'])
             except KeyError:
                 pass
         except UnboundLocalError:

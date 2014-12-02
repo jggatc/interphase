@@ -4,8 +4,8 @@
 #"""
 
 from __future__ import division
-import pygame
 import os
+from env import engine
 
 __docformat__ = 'restructuredtext'
 
@@ -257,26 +257,26 @@ class Control(object):
         if self.switches:
             x1, y1, x2, y2 = self._define_button_placement(control_type, size)
             if not self.control_image:
-                button[self.id] = lambda: pygame.draw.rect(self.panel.image, self.active_color, (self.position,size), fill)
+                button[self.id] = lambda: engine.draw.rect(self.panel.image, self.active_color, (self.position,size), fill)
             else:
-                background = pygame.transform.smoothscale(self.control_image['bg'], size)
+                background = engine.transform.smoothscale(self.control_image['bg'], size)
                 button[self.id+'_bg'] = lambda: self.panel.image.blit(background, self.position)
-                button[self.id] = lambda: pygame.draw.rect(self.panel.image, self.active_color, (self.position,size), fill)
+                button[self.id] = lambda: engine.draw.rect(self.panel.image, self.active_color, (self.position,size), fill)
             if not self.panel._button_image:
-                button[self.id+'_top'] = lambda: pygame.draw.polygon(self.panel.image, color, ((x1,y1-10),(x1-5,y1),(x1+5,y1)), fill)
+                button[self.id+'_top'] = lambda: engine.draw.polygon(self.panel.image, color, ((x1,y1-10),(x1-5,y1),(x1+5,y1)), fill)
             else:
                 button[self.id+'_top'] = lambda: self.panel.image.blit(self.panel._button_image['t'], (x1-self.panel._button_size[0]//2,y1-self.panel._button_size[1]))
             if not self.panel._button_image:
-                button[self.id+'_bottom'] = lambda: pygame.draw.polygon(self.panel.image, color, ((x2,y2+10),(x2-5,y2),(x2+5,y2)), fill)
+                button[self.id+'_bottom'] = lambda: engine.draw.polygon(self.panel.image, color, ((x2,y2+10),(x2-5,y2),(x2+5,y2)), fill)
             else:
                 button[self.id+'_bottom'] = lambda: self.panel.image.blit(self.panel._button_image['b'], (x2-self.panel._button_size[0]//2,y2))
         else:
             if not self.control_image:
-                button[self.id] = lambda: pygame.draw.rect(self.panel.image, self.active_color, (self.position,size), fill)
+                button[self.id] = lambda: engine.draw.rect(self.panel.image, self.active_color, (self.position,size), fill)
             else:
-                background = pygame.transform.smoothscale(self.control_image['bg'], size)
+                background = engine.transform.smoothscale(self.control_image['bg'], size)
                 button[self.id+'_bg'] = lambda: self.panel.image.blit(background, self.position)
-                button[self.id] = lambda: pygame.draw.rect(self.panel.image, self.active_color, (self.position,size), fill)
+                button[self.id] = lambda: engine.draw.rect(self.panel.image, self.active_color, (self.position,size), fill)
         self.button = button
         if initialize:
             button, rects = self._define_button_initialize(button)
@@ -503,7 +503,7 @@ class Control(object):
                 if color_key:
                     if color_key is -1:
                         color_key = img.get_at((0,0))
-                    img.set_colorkey(color_key, pygame.RLEACCEL)
+                    img.set_colorkey(color_key, engine.RLEACCEL)
                 control_icon[item] = img
         else:
             return None
@@ -526,7 +526,7 @@ class Control(object):
                     if w > size[0]:
                         w = size[0]
                         h = int( (w/width) * height )
-                control_icon[icon] = pygame.transform.smoothscale(control_icon[icon], (w,h))
+                control_icon[icon] = engine.transform.smoothscale(control_icon[icon], (w,h))
         return control_icon
 
     def _set_control_size(self, listing, control_icon, size, font_size):
@@ -672,7 +672,7 @@ class Control(object):
             if color_key:
                 if color_key is -1:
                     color_key = self.control_image['bg'].get_at((0,0))
-                self.control_image['bg'].set_colorkey(color_key, pygame.RLEACCEL)
+                self.control_image['bg'].set_colorkey(color_key, engine.RLEACCEL)
         else:
             try:
                 self.control_image['bg'] = self.panel._image_default['control_image']['bg'].copy()
@@ -1642,7 +1642,7 @@ class Textbox(Control):
         self.scroll_line = 1
         self.hold_response = self.hold_response_set
         if not self.control_image:
-            self.image = pygame.Surface(self.size)
+            self.image = engine.Surface(self.size)
         else:
             self.image = self.control_image['bg']
         self.change = True
@@ -1724,7 +1724,7 @@ class Textbox(Control):
         label_position = ( self.position[0]+(self.size[0]//2), self.position[1]-(label_size+3) )
         self.label.set_position(label_position,center=True)
         if not self.control_image:
-            self.image = pygame.Surface(self.size)
+            self.image = engine.Surface(self.size)
         else:
             self.image = self.control_image['bg']
         self.line_max = self.set_line_max()
@@ -1801,8 +1801,8 @@ class Textbox(Control):
         elif button == self.button_reverse:
             self.previous()
         elif button == self.id:
-            mods = pygame.key.get_mods()
-            if mods & pygame.KMOD_CTRL:
+            mods = engine.key.get_mods()
+            if mods & engine.KMOD_CTRL:
                 if self._text_paste:
                     try:
                         text = self.panel.get_clipboard()
@@ -1811,7 +1811,7 @@ class Textbox(Control):
                     if text:
                         self.set_value(text)
                         button = self.id + '_paste'
-            elif mods & pygame.KMOD_SHIFT:
+            elif mods & engine.KMOD_SHIFT:
                 if self._text_paste:
                     try:
                         value = self.get_value()

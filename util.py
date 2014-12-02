@@ -4,10 +4,10 @@
 #"""
 
 from __future__ import division
-import pygame
 import os
 import zipfile
 import cStringIO
+from env import engine
 
 __docformat__ = 'restructuredtext'
 
@@ -38,7 +38,7 @@ class Text(object):
         if isinstance(font_type, str):
             font_type = [font_type]
         if not Text._font:
-            pygame.font.init()
+            engine.font.init()
             font = None
             if font_type:
                 font_type = ','.join(font_type)
@@ -48,13 +48,16 @@ class Text(object):
                         print('Font not found: %s' % font)
                         font = None
                 else:
-                    font = pygame.font.match_font(font_type)
+                    font = engine.font.match_font(font_type)
             if not font:
                 font_type = 'verdana, tahoma, bitstreamverasans, freesans, arial'
-                font = pygame.font.match_font(font_type)
+                font = engine.font.match_font(font_type)
+                if not font:
+                    font = engine.font.get_default_font()
+                    font_type = font
             Text._font['default'] = font
             Text._font['defaults'] = font_type
-            Text._font[font] = { self.font_size:pygame.font.Font(font,self.font_size) }
+            Text._font[font] = { self.font_size:engine.font.Font(font,self.font_size) }
             font_type = None
         if font_type:
             font_type = ','.join(font_type)
@@ -65,10 +68,10 @@ class Text(object):
                         print('Font not found: %s' % font_type)
                         font_type = None
                 else:
-                    font_type = pygame.font.match_font(font_type)
+                    font_type = engine.font.match_font(font_type)
                 if font_type:
                     if font_type not in Text._font:
-                        Text._font[font_type] = { self.font_size:pygame.font.Font(font_type,self.font_size) }
+                        Text._font[font_type] = { self.font_size:engine.font.Font(font_type,self.font_size) }
                 else:
                     font_type = Text._font['default']
             else:
@@ -76,7 +79,7 @@ class Text(object):
         else:
             font_type = Text._font['default']
         if self.font_size not in Text._font[font_type]:
-            Text._font[font_type][self.font_size] = pygame.font.Font(font_type,self.font_size)
+            Text._font[font_type][self.font_size] = engine.font.Font(font_type,self.font_size)
         self.font_type = font_type
         self.font = Text._font[self.font_type]
         self.x = 0
@@ -152,10 +155,10 @@ class Text(object):
                     print('Font not found: %s' % font)
                     font = None
             else:
-                font = pygame.font.match_font(font_type)
+                font = engine.font.match_font(font_type)
             if font:
                 if font not in Text._font:
-                    Text._font[font] = { self.font_size:pygame.font.Font(font,self.font_size) }
+                    Text._font[font] = { self.font_size:engine.font.Font(font,self.font_size) }
                 self.font = Text._font[font]
                 self.font_type = font
                 if default:
@@ -171,7 +174,7 @@ class Text(object):
         elif font_info == 'default':
             return Text._font['default']
         elif font_info == 'system':
-            return pygame.font.get_fonts()
+            return engine.font.get_fonts()
 
     def get_font_size(self):
         """Get current font size."""
@@ -181,7 +184,7 @@ class Text(object):
         """Set font size of text."""
         self.font_size = size
         if size not in Text._font[self.font_type]:
-            Text._font[self.font_type][self.font_size] = pygame.font.Font(self.font_type,self.font_size)
+            Text._font[self.font_type][self.font_size] = engine.font.Font(self.font_type,self.font_size)
         self.font = Text._font[self.font_type]
         self.linesize = self.font[self.font_size].get_linesize()
         self.cache = None
@@ -390,7 +393,7 @@ class Text(object):
 
 def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, colorkey=None, errorhandle=True, errorreport=True):
     """Loads images."""
-    #Modified from PygameChimpTutorial
+    #Modified from engineChimpTutorial
     def convert_image(image, colorkey):
         if image.get_alpha():
             image = image.convert_alpha()
@@ -399,7 +402,7 @@ def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, color
         if colorkey is not None:
             if colorkey is -1:
                 colorkey = image.get_at((0,0))
-            image.set_colorkey(colorkey, pygame.RLEACCEL)
+            image.set_colorkey(colorkey, engine.RLEACCEL)
         return image
     if zipobj:
         if isinstance(zipobj, str):
@@ -425,12 +428,12 @@ def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, color
         namehint = ''
     try:
         if frames == 1:
-            image = pygame.image.load(full_name, namehint)
+            image = engine.image.load(full_name, namehint)
             image = convert_image(image, colorkey)
             return image
         elif frames > 1:
             images = []
-            image = pygame.image.load(full_name, namehint)
+            image = engine.image.load(full_name, namehint)
             width, height = image.get_size()
             width = width // frames
             for frame in range(frames):
@@ -440,7 +443,7 @@ def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, color
                 image_frame = convert_image(image_frame, colorkey)
                 images.append(image_frame)
             return images
-    except pygame.error, message:
+    except engine.error, message:
         if errorhandle:
             raise
         else:

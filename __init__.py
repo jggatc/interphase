@@ -17,8 +17,39 @@
 #Interphase version 0.86
 #Download Site: http://gatc.ca
 
-from interface import Interface, EVENT
-from control import Control, FunctionControl, Label, Textbox
-from util import Text, load_image
-from version import __version__
+
+try:
+    import pygame as engine
+except ImportError:
+    engine = None
+
+
+initialized = False
+
+
+def get_init():
+    """
+    Check if module is initialized.
+    """
+    return initialized
+
+
+def init(engine):
+    """
+    Initialize module. Argument engine is the multimedia framework object.
+    Engine can be Pygame or PyJ2D.
+    Module initialized if Pygame can be imported.
+    """
+    global Interface, EVENT, Control, FunctionControl, Label, Textbox, Text, load_image, __version__, initialized
+    import env
+    env.engine = engine
+    from interface import Interface, EVENT
+    from control import Control, FunctionControl, Label, Textbox
+    from util import Text, load_image
+    from version import __version__
+    initialized = True
+
+
+if engine:
+    init(engine)
 

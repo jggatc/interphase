@@ -64,10 +64,17 @@ get_value, set_value, get_list, set_list, remove_list, set_list_icon, set_contro
 
 __docformat__ = 'restructuredtext'
 
-from interface import Interface, EVENT
-from control import Control, FunctionControl, Label, Textbox
-from util import Text, load_image
-from version import __version__
+try:
+    import pygame as engine
+    import env
+    env.engine = engine
+    from interface import Interface, EVENT
+    from control import Control, FunctionControl, Label, Textbox
+    from util import Text, load_image
+    from version import __version__
+except ImportError:
+    engine = None
+
 import warnings
 warnings.filterwarnings("ignore")
 
