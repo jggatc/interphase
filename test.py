@@ -289,9 +289,8 @@ class InterfaceDemo(interphase.Interface):
                         self.doc_panel = None
                         self.doc_init = False
                         self.doc_browse = False
-                        rect = (0,0,500,400)
-                        self.screen.blit(self.background, (0,0), rect)
-                        pygame.display.update(rect)
+                        rect = self.screen.blit(self.background, (0,0), (0,0,500,400))
+                        self.update_rect.append(rect)
             elif state.control == 'Control':
                 if self.doc_browse:
                     for control in ('Previous', 'Next'):
