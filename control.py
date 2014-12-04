@@ -1020,7 +1020,6 @@ class Control(object):
         """Get text margin. Return [t,r,b,l]."""
         return [self.text_margin['t'], self.text_margin['r'], self.text_margin['b'], self.text_margin['l']]
 
-
     def is_activated(self):
         """Check whether control is activated."""
         return self.activated
@@ -1832,7 +1831,7 @@ class Textbox(Control):
     def get_text(self, display=False):
         """Get formated text lines. Parameter: display set to True to get lines currently showing, defaults to False to get all text lines."""
         if not display:
-            return self.test
+            return self.text
         else:
             return self.text[self.line_pos:self.line_pos+self.line_max]
 
