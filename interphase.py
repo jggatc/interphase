@@ -3,7 +3,7 @@
 """
 Interphase Module
 
-The module adds interface panel functionality to a Pygame application. It was developed as a simple GUI with the goal to simulate a digital display panel. The module provides interface and control objects to design a panel, and numerous methods to manage the panel from the application code. Run interphase.py separately for an interface panel demo that is coded in test.py.
+The module adds interface panel functionality to a Pygame application. It was developed as a simple GUI with the goal to simulate a digital display panel. The module provides interface and control objects to design a panel, and numerous methods to manage the panel from the application code. Run interphase.py separately for an interface panel demo that is coded in demo.py.
 
 To utilize the module, place the interphase folder in the path or within script folder, and import the module to the application with the statement 'import interphase'. A zip of the interphase folder can also be used with the statement "sys.path.insert(0,'./interphase_zipfile')" prior to import.
 
@@ -81,10 +81,10 @@ warnings.filterwarnings("ignore")
 
 def main():
     try:
-        import test
-        test.run()
+        import demo
+        demo.run()
     except ImportError:
-        print("Warning: test.py not found.")
+        print("Warning: demo.py not found.")
 
 if __name__ == '__main__':
     main()

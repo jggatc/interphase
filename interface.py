@@ -31,7 +31,7 @@ class Interface(engine.sprite.Sprite):
     
     Interface interaction can be maintained with the InterfaceState object, that is returned by update() or get_state(), or through Pygame event queue checking for event.type interphase.EVENT[ 'controlselect' ] and interphase.EVENT[ 'controlinteract' ] with the attribute event.state that references the InterfaceState object. To turn the panel off, deactivate() sets state.active to false. The panel can be drawn to the display with the draw() method.
     
-    The module includes test.py that demonstrates some of Interphase functionality.
+    The module includes demo.py that demonstrates some of Interphase functionality.
     """
 
     _image_default = None
