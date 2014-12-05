@@ -6,12 +6,7 @@
 from __future__ import division
 from control import Control, FunctionControl, Label, Textbox
 from util import Text, load_image
-try:
-    from image import _image_decode
-except ImportError:
-    pass
 import os
-import zipfile
 from env import engine
 
 __docformat__ = 'restructuredtext'
@@ -378,6 +373,7 @@ class Interface(engine.sprite.Sprite):
 
     def _zip_file(self, zip_file=None, close=False):
         """Retrieve zipfile object."""
+        import zipfile
         if not close:
             if not zip_file:
                 zip_file = self._data_zip
@@ -432,6 +428,7 @@ class Interface(engine.sprite.Sprite):
     def _default_image(self):
         """Set default images."""
         try:
+            from image import _image_decode
             image_obj = _image_decode()
         except:
             image_obj = {}
@@ -518,7 +515,7 @@ class Interface(engine.sprite.Sprite):
         self.image = self._panel_image.copy()
         self.rect = self.image.get_rect(center=(self._x,self._y))
         if self._initialized:
-            self.panel_update()
+            self._display_controls()
         return self._panel_image
 
     def set_control_image(self, control_image=None, data_folder=None, data_zip=None, file_obj=None, color_key=None, surface=None):
@@ -553,7 +550,7 @@ class Interface(engine.sprite.Sprite):
         if self._initialized:
             for ctrl in self._controls:
                 self._controls[ctrl]._define_buttons(self._controls[ctrl].control_type, self._controls[ctrl].size, self._controls[ctrl].color['normal'], self._controls[ctrl].color['fill'], initialize=False)
-            self.panel_update()
+            self._display_controls()
         return self._control_image
 
     def set_button_image(self, button_image=None, data_folder=None, data_zip=None, file_obj=None, color_key=None, surface=None):
@@ -588,7 +585,7 @@ class Interface(engine.sprite.Sprite):
         if self._initialized:
             for ctrl in self._controls:
                 self._controls[ctrl]._define_buttons(self._controls[ctrl].control_type, self._controls[ctrl].size, self._controls[ctrl].color['normal'], self._controls[ctrl].color['fill'], initialize=False)
-            self.panel_update()
+            self._display_controls()
         return self._button_image
 
     def get_clipboard(self):
@@ -677,7 +674,7 @@ class Interface(engine.sprite.Sprite):
             color = self._controls[ctrl].color['normal']
             fill = self._controls[ctrl].color['fill']
             self._controls[ctrl].button, self._controls[ctrl].rects = self._controls[ctrl]._define_buttons(control_type, size, color, fill)
-        self.panel_update()
+        self._update_panel = True
 
     def set_panel_display(self, setting='Toggle'):
         """Set whether panel display toggled with pointer interaction."""
@@ -880,14 +877,18 @@ class Interface(engine.sprite.Sprite):
     def _display_controls(self):
         """Draws controls on panel.""" 
         if self._panel_active:
-            self.image = self._panel_image.copy()
+            if not hasattr(self.image, 'clear'):
+                self.image = self._panel_image.copy()
+            else:
+                self.image.clear()
+                self.image.blit(self._panel_image, (0,0))
             for ctrl in self._controls:
                 if self._controls[ctrl].active:
                     self.image = self._controls[ctrl]._display(self.image)
                     if self._label_display and self._controls[ctrl].label_display:
                         if not self._controls[ctrl].label_text.startswith('__'):
                             self._controls[ctrl].label.add(self._controls[ctrl].label_text)
-                            self.image = self._controls[ctrl].label(self.image)
+                            self.image = self._controls[ctrl].label.render(self.image)
             if self._tips_display:
                 if self._panel_interact:
                     mouse_x, mouse_y = self._pointer_position
@@ -915,7 +916,7 @@ class Interface(engine.sprite.Sprite):
                             pos = pos[0]+self._tips_position[0], pos[1]+self._tips_position[1]
                             self._tips.set_position(pos, center=True)
                             self._tips.add(tip)
-                            self.image = self._tips(self.image)
+                            self.image = self._tips.render(self.image)
                     except:
                         pass
                 else:
@@ -923,7 +924,7 @@ class Interface(engine.sprite.Sprite):
             if self._info_display:
                 if self._info_displaying:
                     if self._info.has_text():
-                        self.image = self._info(self.image)
+                        self.image = self._info.render(self.image)
                     else:
                         self._info_displaying = False
             self.rect = self.image.get_rect(center=(self._x,self._y))
@@ -934,13 +935,11 @@ class Interface(engine.sprite.Sprite):
             self._moveable_panel()
         if self._info_displaying:
             self._update_panel = True
-        while True:
-            try:
-                ctrl = self._control_event.pop()
+        if self._control_event:
+            for ctrl in self._control_event:
                 if ctrl._check():
                     self._update_panel = True
-            except IndexError:
-                break
+            self._control_event[:] = []
         update, self._pointer_position = self._panel_interaction()
         self._panel_action()
         return update
@@ -961,16 +960,13 @@ class Interface(engine.sprite.Sprite):
         def move_panel(pos_i, pos_f, z, z_dir, rate_x=0, rate_y=0):
             if not self._move_initiate:
                 fps = self._clock.get_fps()
-                try:
-                    self._move_ratex = int(self._directionx/fps)
-                    if not self._move_ratex:
-                        self._move_ratex = 1
-                    self._move_ratey = int(self._directiony/fps)
-                    if not self._move_ratey:
-                        self._move_ratey = 1
-                    self._move_initiate = True
-                except ZeroDivisionError:
-                    pass
+                self._move_ratex = int(self._directionx/fps)
+                if not self._move_ratex:
+                    self._move_ratex = 1
+                self._move_ratey = int(self._directiony/fps)
+                if not self._move_ratey:
+                    self._move_ratey = 1
+                self._move_initiate = True
             if rate_x:
                 rate_x = rate_x*z_dir * z
                 rate = rate_x
@@ -1135,18 +1131,24 @@ class Interface(engine.sprite.Sprite):
             control_interact, button_interact, control_select, button_select = self._interact()
             if control_select:
                 button_select, value = self._control_action(control_select, button_select)
+                self._update_panel = True
             else:
                 button_select, value = None, None
-            self._update_panel = True
         self._clock.tick()
         if force_update:
             self._update_panel = True
         if self._update_panel:
             self._display_controls()
             panel = self
-            try:
+            if update:
                 self._interface['state'] = InterfaceState(panel, control_interact, button_interact, control_select, button_select, value)
-            except UnboundLocalError:
+                if control_select:
+                    if self._controls[control_select].event:
+                        engine.event.post(self._events['controlselect'])
+                if control_interact:
+                    if self._controls[control_interact].event:
+                        engine.event.post(self._events['controlinteract'])
+            else:
                 self._interface['state'] = InterfaceState(panel)
             self._interface['update'] = True
             self._update_panel = False
@@ -1156,19 +1158,6 @@ class Interface(engine.sprite.Sprite):
                 self._interface['state'] = InterfaceState(panel)
                 self._interface['update'] = False
             self._interface['state'].panel_interact = self._panel_interact
-        try:
-            try:
-                if self._controls[control_select].event:
-                    engine.event.post(self._events['controlselect'])
-            except KeyError:
-                pass
-            try:
-                if self._controls[control_interact].event:
-                    engine.event.post(self._events['controlinteract'])
-            except KeyError:
-                pass
-        except UnboundLocalError:
-            pass
         return self._interface['state']
 
     def update(self):

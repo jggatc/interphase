@@ -5,8 +5,6 @@
 
 from __future__ import division
 import os
-import zipfile
-import cStringIO
 from env import engine
 
 __docformat__ = 'restructuredtext'
@@ -95,6 +93,15 @@ class Text(object):
         self.cache_key = None
 
     def __call__(self, surface='default'):
+        """Writes text to surface."""
+        if surface == 'default':
+            self.surface = self.screen
+        else:
+            self.surface = surface
+        self.update()
+        return self.surface
+
+    def render(self, surface='default'):
         """Writes text to surface."""
         if surface == 'default':
             self.surface = self.screen
@@ -333,6 +340,11 @@ class Text(object):
     def tprint(self):
         """Print text to surface."""
         if self.messages != []:
+            if not self.cache:
+                self.cache_key = self.font_type + str(self.font_size) + str(self.font_color) + str(self.font_bgcolor)
+                if self.cache_key not in self._cache:
+                    self._cache[self.cache_key] = {}
+                self.cache = self._cache[self.cache_key]
             if not self.multiline:
                 text = " ".join(self.messages)
                 if not self.split_text or text.strip().count(' ') == 0:
@@ -342,11 +354,9 @@ class Text(object):
                     else:
                         x = self.x + self.margin['l']
                     for ch in text:
-                        try:
-                            self.surface.blit(self.cache[ch]['image'], (x,self.y))
-                        except (KeyError, TypeError):
+                        if ch not in self.cache:
                             self._cache_chr(ch)
-                            self.surface.blit(self.cache[ch]['image'], (x,self.y))
+                        self.surface.blit(self.cache[ch]['image'], (x,self.y))
                         x += self.cache[ch]['width']
                 else:
                     words = text.count(' ')
@@ -361,11 +371,9 @@ class Text(object):
                             x = self.x
                             y = position_y + (count*self.linesize)
                         for ch in text:
-                            try:
-                                self.surface.blit(self.cache[ch]['image'], (x,y))
-                            except (KeyError, TypeError):
+                            if ch not in self.cache:
                                 self._cache_chr(ch)
-                                self.surface.blit(self.cache[ch]['image'], (x,y))
+                            self.surface.blit(self.cache[ch]['image'], (x,y))
                             x += self.cache[ch]['width']
             else:
                 position_y = self.y + self.margin['t']
@@ -378,11 +386,9 @@ class Text(object):
                         x = self.x + self.margin['l']
                         y = position_y + (count*self.linesize)
                     for ch in text:
-                        try:
-                            self.surface.blit(self.cache[ch]['image'], (x,y))
-                        except (KeyError, TypeError):
+                        if ch not in self.cache:
                             self._cache_chr(ch)
-                            self.surface.blit(self.cache[ch]['image'], (x,y))
+                        self.surface.blit(self.cache[ch]['image'], (x,y))
                         x += self.cache[ch]['width']
             self.message = None
             self.messages = []
@@ -405,6 +411,11 @@ def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, color
             image.set_colorkey(colorkey, engine.RLEACCEL)
         return image
     if zipobj:
+        import zipfile
+        try:
+            import cStringIO
+        except ImportError:
+            import StringIO as cStringIO
         if isinstance(zipobj, str):
             if path:
                 data_file = os.path.join(path, zipobj)

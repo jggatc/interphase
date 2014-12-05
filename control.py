@@ -311,34 +311,26 @@ class Control(object):
         pass
 
     def _display(self, image):
-        try:
-            for btn in self.button_list:
-                rect = self.button[btn]()
-        except KeyError:
-            return image
-        try:
-            if self.list_type.startswith('__') or not self.value.startswith('__'):
-                self.display.add(self.value)
-                image = self.display(image)
-            else:
-                if self.control_icon:
-                    try:
-                        x,y = self.position
-                        size = self.size
-                        isize = self.control_icon[self.value].get_size()
-                        x += (size[0]-isize[0])//2
-                        y += (size[1]-isize[1])//2
-                        image.blit(self.control_icon[self.value], (x,y))
-                    except KeyError:
-                        pass
-        except AttributeError:  #no value
-            pass
+        for btn in self.button_list:
+            rect = self.button[btn]()
+        if self.list_type.startswith('__') or not self.value.startswith('__'):
+            self.display.add(self.value)
+            image = self.display.render(image)
+        else:
+            if self.control_icon:
+                if self.value in self.control_icon:
+                    x,y = self.position
+                    size = self.size
+                    isize = self.control_icon[self.value].get_size()
+                    x += (size[0]-isize[0])//2
+                    y += (size[1]-isize[1])//2
+                    image.blit(self.control_icon[self.value], (x,y))
         return image
 
     def _set_listing(self, control_list=None, icon_list=None, size='auto', case=False, data_folder=None, data_zip=None, file_obj=None, color_key=None, surface=None):
         """Initiate control option list."""
         if not control_list:
-            control_list = []
+            control_list = ['']
         if not icon_list and not surface:
             icon_list = []
         control_icon = {}
@@ -686,7 +678,7 @@ class Control(object):
                 self.control_outline = self.outline
             self._set_buttonlist()
             self._define_buttons(self.control_type, self.size, self.color['normal'], self.color['fill'], initialize=False)
-            self.panel.panel_update()
+            self.panel._display_controls()
         return self.control_image
 
     def set_color(self, color=None, activated_color=None, fill=None):
@@ -868,7 +860,7 @@ class Control(object):
                     if item not in self.tips:
                         self.tips[item] = ''
         self._define_buttons(self.control_type, self.size, self.color['normal'], self.color['fill'], initialize=False)
-        self.panel.panel_update()
+        self.panel._update_panel = True
         return control_icon
 
     def get_list(self):
@@ -1314,29 +1306,20 @@ class Control(object):
         control = self.panel._controls[ctrl]
         if control.link:
             if not activate:
-                try:
-                    for ctr in control.link[control.value]:
-                        self.panel._controls[ctr].set_active(False)
-                        if not self.panel._controls[ctr].is_activated_lock():
-                            self.panel._controls[ctr].set_activated(False)
-                        self.check_link(ctr, activate)
-                except KeyError:
-                    pass
+                for ctr in control.link[control.value]:
+                    self.panel._controls[ctr].set_active(False)
+                    if not self.panel._controls[ctr].is_activated_lock():
+                        self.panel._controls[ctr].set_activated(False)
+                    self.check_link(ctr, activate)
             else:
                 if (control.control_type == 'function_select' and control.link_activated) or control.control_type == 'function_toggle':
-                    try:
-                        for ctr in control.link[control.value]:
-                            self.panel._controls[ctr].set_active(True)
-                            self.check_link(ctr, activate)
-                    except KeyError:
-                        pass
+                    for ctr in control.link[control.value]:
+                        self.panel._controls[ctr].set_active(True)
+                        self.check_link(ctr, activate)
                 else:
-                    try:
-                        for ctr in control.link[control.value]:
-                            self.panel._controls[ctr].set_active(control.activated)
-                            self.check_link(ctr, control.activated)
-                    except KeyError:
-                        pass
+                    for ctr in control.link[control.value]:
+                        self.panel._controls[ctr].set_active(control.activated)
+                        self.check_link(ctr, control.activated)
 
     def _check(self):
         if self.activated and self.activated_toggle:
@@ -1413,13 +1396,7 @@ class Control(object):
             self.activated = not self.activated
         elif button == self.button_forward:
             self.activated = False
-            try:
-                self.value += self.numeric['step']
-            except TypeError:
-                if self.listing[0][-1] == 'i':
-                    self.value = int(self.numeric['value']) + self.numeric['step']
-                else:
-                    self.value = float(self.numeric['value']) + self.numeric['step']
+            self.value += self.numeric['step']
             if greater(self.value, self.numeric['h'], self.numeric['step']) and self.value != self.numeric['h']:
                 if self.loop:
                     self.value = self.numeric['l']
@@ -1428,13 +1405,7 @@ class Control(object):
             self.numeric['value'] = str(self.value)
         elif button == self.button_reverse:
             self.activated = False
-            try:
-                self.value -= self.numeric['step']
-            except TypeError:
-                if self.listing[0][-1] == 'i':
-                    self.value = int(self.numeric['value']) - self.numeric['step']
-                else:
-                    self.value = float(self.numeric['value']) - self.numeric['step']
+            self.value -= self.numeric['step']
             if not greater(self.value, self.numeric['l'], self.numeric['step']) and self.value != self.numeric['l']:
                 if self.loop:
                     self.value = self.numeric['h']
@@ -1492,10 +1463,7 @@ class Control(object):
                         self.place += 1
                     else:
                         self.place = 0
-                try:
-                    self.value = self.listing[self.place]
-                except IndexError:
-                    self.value = ''
+                self.value = self.listing[self.place]
         if not self.activated:
             self.active_color = self.color['normal']
         else:
@@ -1540,10 +1508,7 @@ class FunctionControl(Control):
                         self.place = 0
                     else:
                         self.place = len(self.listing)-1
-                try:
-                    self.value = self.listing[self.place]
-                except IndexError:
-                    self.value = ''
+                self.value = self.listing[self.place]
                 self.check_link(self.id, True)
             elif button == self.button_reverse:
                 self.activated = False
@@ -1555,10 +1520,7 @@ class FunctionControl(Control):
                         self.place = len(self.listing)-1
                     else:
                         self.place = 0
-                try:
-                    self.value = self.listing[self.place]
-                except IndexError:
-                    self.value = ''
+                self.value = self.listing[self.place]
                 self.check_link(self.id, True)
         else:
             if button == self.id:
@@ -1568,10 +1530,7 @@ class FunctionControl(Control):
                     self.place += 1
                 else:
                     self.place = 0
-                try:
-                    self.value = self.listing[self.place]
-                except IndexError:
-                    self.value = ''
+                self.value = self.listing[self.place]
                 self.check_link(self.id, True)
         if not self.activated:
             self.active_color = self.color['normal']
@@ -1640,10 +1599,7 @@ class Textbox(Control):
         self.line_pos = 0
         self.scroll_line = 1
         self.hold_response = self.hold_response_set
-        if not self.control_image:
-            self.image = engine.Surface(self.size)
-        else:
-            self.image = self.control_image['bg']
+        self.image = engine.Surface(self.size, engine.SRCALPHA)
         self.change = True
         self._format_function = []
         self._format_splitlines = True
@@ -1722,10 +1678,7 @@ class Textbox(Control):
         label_size = self.label.get_font_size()
         label_position = ( self.position[0]+(self.size[0]//2), self.position[1]-(label_size+3) )
         self.label.set_position(label_position,center=True)
-        if not self.control_image:
-            self.image = engine.Surface(self.size)
-        else:
-            self.image = self.control_image['bg']
+        self.image = engine.Surface(self.size, engine.SRCALPHA)
         self.line_max = self.set_line_max()
         self.line_width = self.size[0]
         self.text = self.format_text()
@@ -1733,22 +1686,20 @@ class Textbox(Control):
         self.panel._update_panel = True
 
     def _display(self, image):
-        try:
-            for btn in self.button_list:
-                rect = self.button[btn]()
-        except KeyError:
-            return image
+        for btn in self.button_list:
+            rect = self.button[btn]()
         if self.change:
-            try:
-                for line in self.text[self.line_pos:self.line_pos+self.line_max]:
-                    self.display.add(line)
-                if not self.control_image:
-                    self.image.fill(self.color['normal'])
-                    self.image = self.display(self.image)
+            for line in self.text[self.line_pos:self.line_pos+self.line_max]:
+                self.display.add(line)
+            if not self.control_image:
+                self.image.fill(self.color['normal'])
+                self.image = self.display.render(self.image)
+            else:
+                if not hasattr(self.image, 'clear'):
+                    self.image = self.display.render(engine.Surface(self.size, engine.SRCALPHA))
                 else:
-                    self.image = self.display(self.control_image['bg'].copy())
-            except AttributeError:
-                pass
+                    self.image.clear()
+                    self.image = self.display.render(self.image)
             self.change = False
         image.blit(self.image, self.position)
         return image

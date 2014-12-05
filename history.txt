@@ -129,6 +129,8 @@ InterfaceControl Class changes:
 
 0.87_git
 -update Text.tprint to use rendered character cache.
--refactor module to isolate framework, can use Pygame or PyJ2D.
+-refactor module to isolate framework.
+-update module for alternate framework, can use Pygame, PyJ2D, or Pyjsdl.
 -add interphase.init and interphase.get_init to initialize module.
+-update textbox.get_text to properly return text.
 
