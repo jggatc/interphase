@@ -231,6 +231,7 @@ class Control(object):
             self.link = {}
         self.link_activated = link_activated
         self._function = lambda control,value:None      #control function
+        self._functionObj = None
         if event is not None:
             self.event = event
         else:
@@ -322,8 +323,8 @@ class Control(object):
                     x,y = self.position
                     size = self.size
                     isize = self.control_icon[self.value].get_size()
-                    x += (size[0]-isize[0])//2
-                    y += (size[1]-isize[1])//2
+                    x += int( (size[0]-isize[0])/2 )
+                    y += int( (size[1]-isize[1])/2 )
                     image.blit(self.control_icon[self.value], (x,y))
         return image
 
@@ -359,7 +360,7 @@ class Control(object):
                         self.numeric['step'] = 1
                 numeric_type = 'integer'
                 for num in ('l','h','step'):
-                    if isinstance(self.numeric[num], float):
+                    if not isinstance(self.numeric[num], int):
                         numeric_type = 'float'
                         break
                 if numeric_type == 'integer':
@@ -977,9 +978,14 @@ class Control(object):
         else:
             return None
 
-    def add_action(self, function):
-        """Bind action function to control. Function should take two arguments, for instance Function(control, value), that will receive the control button pressed and control value."""
+    def add_action(self, function, obj=None):
+        """Bind action function to control. Function should take two arguments, for instance Function(control, value), that will receive the control button pressed and control value. Optional obj argument to provide object for method binding in Pyjs -O mode."""
         self._function = function
+        try:
+            if obj and engine.env.pyjs_mode.optimized:
+                self._functionObj = obj
+        except AttributeError:
+            pass
         return None
 
     def get_id(self):
@@ -1426,7 +1432,10 @@ class Control(object):
         if self.switches:
             if self.listing:
                 if self.listing[0][:-2] == '__numeric':
-                    { 'i':self._action_numeric_i,'f':self._action_numeric_f }[self.listing[0][-1]](button)
+                    if self.listing[0][-1] == 'i':
+                        self._action_numeric_i(button)
+                    else:
+                        self._action_numeric_f(button)
                 else:
                     if button == self.id:
                         self.activated = not self.activated
@@ -1469,7 +1478,10 @@ class Control(object):
         else:
             self.active_color = self.color['activated']
         self.panel._control_values[self.id] = self.value
-        self._function(button, self.value)
+        if not self._functionObj:
+            self._function(button, self.value)
+        else:   #pyjs -O function>unbound method
+            engine.util.call(self._functionObj, self._function, (button,self.value))
         self.panel._control_event.append(self)
         self.panel._update_panel = True
         return button, self.value
@@ -1537,7 +1549,10 @@ class FunctionControl(Control):
         else:
             self.active_color = self.color['activated']
         self.panel._control_values[self.id] = self.value
-        self._function(button, self.value)
+        if not self._functionObj:
+            self._function(button, self.value)
+        else:   #pyjs -O function>unbound method
+            engine.util.call(self._functionObj, self._function, (button,self.value))
         self.panel._control_event.append(self)
         self.panel._update_panel = True
         return button, self.value
@@ -1602,6 +1617,7 @@ class Textbox(Control):
         self.image = engine.Surface(self.size, engine.SRCALPHA)
         self.change = True
         self._format_function = []
+        self._formatObj = None
         self._format_splitlines = True
         self._format_wordwrap = True
         self.text = self.format_text()
@@ -1611,15 +1627,19 @@ class Textbox(Control):
         text = self.get_value()
         if self._format_splitlines:
             text = [line for line in text.splitlines()]
-        for func in self._format_function:
-            text = func(text)
+        if not self._formatObj:
+            for func in self._format_function:
+                text = func(text)
+        else:   #pyjs -O function>unbound method
+            for func in self._format_function:
+                text = engine.util.call(self._formatObj, func, (text,))
         if self._format_wordwrap:
             text = self.display.word_wrap(text, self.line_width)
         self.text = text
         return self.text
 
-    def add_format(self, *function):
-        """Custom format functions. Parameter function is a list of functions that will be applied to text formatting. The functions should receive a text argument, and return the formated text. Passing string 'splitlines', 'nosplitlines', 'wordwrap', 'nowordwrap' will modify standard format procedure."""
+    def add_format(self, function, obj=None):
+        """Custom format functions. Parameter function is a list of functions that will be applied to text formatting. The functions should receive a text argument, and return the formated text. Passing string 'splitlines', 'nosplitlines', 'wordwrap', 'nowordwrap' will modify standard format procedure. Optional obj argument to provide object for method binding in Pyjs -O mode."""
         func = []
         for fn in function:
             if fn == 'splitlines':
@@ -1633,11 +1653,17 @@ class Textbox(Control):
             else:
                 func.append(fn)
         self._format_function = func
+        try:
+            if obj and engine.env.pyjs_mode.optimized:
+                self._formatObj = obj
+        except AttributeError:
+            pass
 
     def set_line_max(self, line=None):
         """Set max lines of textbox. Optional line parameter."""
         if line is None:
-            self.line_max = (self.size[1] - (self.text_margin['t']+self.text_margin['b']) +2) // self.display.linesize
+            box_size = self.size[1] - (self.text_margin['t']+self.text_margin['b']) + 2
+            self.line_max = box_size // self.display.linesize
         else:
             self.line_max = line
         return self.line_max

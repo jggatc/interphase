@@ -667,7 +667,8 @@ class Interface(engine.sprite.Sprite):
     def move(self, x, y):
         """Move panel to new position x,y."""
         self._x, self._y = x, y
-        self._panel_rect.center = self._x, self._y
+        self._panel_rect.x = self._x-(self.width//2)
+        self._panel_rect.y = self._y-(self.height//2)
         for ctrl in self._controls:
             control_type = self._controls[ctrl].control_type
             size = self._controls[ctrl].size
@@ -946,7 +947,10 @@ class Interface(engine.sprite.Sprite):
 
     def _panel_action(self):
         for function in self._panel_function:
-            function()
+            try:
+                function()
+            except TypeError:   #pyjs -O function>unbound method
+                function(self)
 
     def set_panel_function(self, function=None):
         """Add function to panel update list, call without function to delete list."""
