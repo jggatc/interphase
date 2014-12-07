@@ -132,5 +132,6 @@ InterfaceControl Class changes:
 -refactor module to isolate framework.
 -update module for alternate framework, can use Pygame, PyJ2D, or Pyjsdl.
 -add interphase.init and interphase.get_init to initialize module.
+-add textbox clipboard functionality for PyJ2D and Pyjsdl via pyjsdl.display.textarea.
 -update textbox.get_text to properly return text.
 

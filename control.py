@@ -1598,7 +1598,7 @@ class Textbox(Control):
 
     The Textbox class is a Control subclass. The control value can be set to a long text string, which can be scrolled. The text applied will undergo formating that includes wordwrap, and custom format methods can be linked in with the add_format method.
     
-    If the clipboard is enabled with the Control parameter text_paste, the control can use the copy and paste feature with the mouse while holding SHIFT and CTRL. For a control of identity 'Control', the clipboard access results in reporting in the InterfaceState object as button 'Control_copy' and 'Control_paste'.
+    If the clipboard is enabled with the Control parameter text_paste, the control can use the copy and paste feature with the mouse while holding SHIFT and CTRL. The clipboard functionality in Pyjsdl handled by pyjsdl.display.textarea displayed by textarea.toggle(). For a control of identity 'Control', the clipboard access results in reporting in the InterfaceState object as button 'Control_copy' and 'Control_paste'.
     """
 
     def _initiate(self):

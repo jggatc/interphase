@@ -609,14 +609,35 @@ class Interface(engine.sprite.Sprite):
                     Interface._clipboard.withdraw()
                     Interface._clipboard_type = 'tk'
                 except ImportError:
-                    Interface._clipboard = None
-                    Interface._clipboard_type = None
+                    try:
+                        global StringSelection, DataFlavor, UnsupportedFlavorException, IOException, IllegalStateException
+                        from java.awt.datatransfer import StringSelection, DataFlavor
+                        from java.awt.datatransfer import UnsupportedFlavorException
+                        from java.io import IOException
+                        from java.lang import IllegalStateException
+                        from java.awt import Toolkit
+                        Interface._clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+                        Interface._clipboard_type = 'jtk'
+                    except ImportError:
+                        try:
+                            engine.display.textbox_init()
+                            Interface._clipboard = engine.display.textarea
+                            Interface._clipboard_type = 'js'
+                        except AttributeError:
+                            Interface._clipboard = None
+                            Interface._clipboard_type = None
         if Interface._clipboard_type == 'gtk':
             self.get_clipboard = self._get_clipboard_gtk
             self.set_clipboard = self._set_clipboard_gtk
         elif Interface._clipboard_type == 'tk':
             self.get_clipboard = self._get_clipboard_tk
             self.set_clipboard = self._set_clipboard_tk
+        elif Interface._clipboard_type == 'jtk':
+            self.get_clipboard = self._get_clipboard_jtk
+            self.set_clipboard = self._set_clipboard_jtk
+        elif Interface._clipboard_type == 'js':
+            self.get_clipboard = self._get_clipboard_js
+            self.set_clipboard = self._set_clipboard_js
 
     def _get_clipboard_gtk(self):
         text = Interface._clipboard.wait_for_text()
@@ -634,6 +655,32 @@ class Interface(engine.sprite.Sprite):
     def _set_clipboard_tk(self, text):
         Interface._clipboard.clipboard_clear()
         Interface._clipboard.clipboard_append(text)
+
+    def _get_clipboard_jtk(self):
+        contents = Interface._clipboard.getContents(None)
+        if contents != None:
+            try:
+                text = contents.getTransferData(DataFlavor.stringFlavor)
+            except (UnsupportedFlavorException, IOException):
+                text = None
+        else:
+            text = None
+        return text
+
+    def _set_clipboard_jtk(self, text):
+        try:
+            Interface._clipboard.setContents(StringSelection(text), None)
+        except IllegalStateException:
+            pass
+        return
+
+    def _get_clipboard_js(self):
+        text = Interface._clipboard.getText()
+        return text
+
+    def _set_clipboard_js(self, text):
+        Interface._clipboard.setText(text)
+        return
 
     def is_active(self):
         """Check whether panel is active."""
