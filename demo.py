@@ -543,7 +543,7 @@ class InterfacePuzzle(interphase.Interface):
                     success = self.puzzle_final()
                     if success:
                         self.puzzle_solving = False
-                        time = ( pygame.time.get_ticks() - self.grid_timer ) // 1000
+                        time = int((pygame.time.get_ticks()-self.grid_timer)/1000)
                         control_start = self.get_control('Start')
                         control_start.set_value(str(time)+'s')
                         control_start.set_active(True)
