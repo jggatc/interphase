@@ -13,11 +13,7 @@ __docformat__ = 'restructuredtext'
 class Text(object):
     """
     Receives text to display on surface.
-    
-    Parameters:
-        surface: 'surface' destination surface for text.
-        font_type: [] list of font names
-        font_size: int font size
+    Arguments include the target surface for text rendering, font_type is a list of alternate font names, and font_size is the font size.
     """
 
     _font = {}
@@ -398,8 +394,10 @@ class Text(object):
 
 
 def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, colorkey=None, errorhandle=True, errorreport=True):
-    """Loads images."""
-    #Modified from engineChimpTutorial
+    """
+    Load image from file.
+    Arguments include the image filename, the number of image frames in an image strip, the image path, zipobj for image in a zip file, fileobj for image in a file-like object, image colorkey, errorhandle and errorreport for exception handling.
+    """
     def convert_image(image, colorkey):
         if image.get_alpha():
             image = image.convert_alpha()
@@ -449,7 +447,7 @@ def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, color
             width = width // frames
             for frame in range(frames):
                 frame_num = width * frame
-                image_frame = image.subsurface((frame_num,0), (width,height)).copy()
+                image_frame = image.subsurface((frame_num,0,width,height)).copy()
                 image_frame.set_alpha(image.get_alpha())
                 image_frame = convert_image(image_frame, colorkey)
                 images.append(image_frame)
