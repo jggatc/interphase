@@ -4,7 +4,10 @@
 #"""
 
 import base64
-import cStringIO
+try:
+    import cStringIO
+except ImportError:
+    import StringIO as cStringIO
 import sys
 
 __docformat__ = 'restructuredtext'
@@ -15,7 +18,10 @@ def _image_encode(image_file):
     image = file(image_file, 'r')
     image_obj = cStringIO.StringIO(image.read())
     image.close()
-    image_dat = base64.b64encode(image_obj.getvalue())
+    try:
+        image_dat = base64.b64encode(image_obj.getvalue())
+    except AttributeError:
+        image_dat = base64.encodestring(image_obj.getvalue())
     foutput = open('_'+image_file[:-4]+'.py', 'w')
     foutput.write('_image[\'' + image_file + '\'] = \\\n')
     foutput.write('"')
@@ -27,13 +33,19 @@ def _image_encode(image_file):
 def _image_decode(image=None):
     """Decode image from base64 encoded string."""
     if image:
-        image_dat = base64.b64decode(_image[image])
+        try:
+            image_dat = base64.b64decode(_image[image])
+        except AttributeError:
+            image_dat = base64.decodestring(_image[image])
         image_obj = cStringIO.StringIO(image_dat)
         return image_obj
     else:
         image_objs = {}
         for image in _image:
-            image_dat = base64.b64decode(_image[image])
+            try:
+                image_dat = base64.b64decode(_image[image])
+            except AttributeError:
+                image_dat = base64.decodestring(_image[image])
             image_objs[image[:-4]] = ( image, cStringIO.StringIO(image_dat) )
         return image_objs
 
