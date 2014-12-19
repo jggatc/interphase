@@ -13,6 +13,14 @@ import sys
 __docformat__ = 'restructuredtext'
 
 
+def _load_default_images():
+    import env
+    try:
+        env.engine.display.setup_images([(i,_image[i]) for i in _image])
+    except AttributeError:
+        pass
+
+
 def _image_encode(image_file):
     """Encode image to base64 encoded string."""
     image = file(image_file, 'r')

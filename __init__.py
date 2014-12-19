@@ -34,12 +34,7 @@ def get_init():
     return initialized
 
 
-def init(engine):
-    """
-    Initialize module. Argument engine is the multimedia framework object.
-    Engine can be Pygame or PyJ2D.
-    Module initialized if Pygame can be imported.
-    """
+def _init(engine):
     global Interface, EVENT, Control, FunctionControl, Label, Textbox, Text, load_image, __version__, initialized
     import env
     env.engine = engine
@@ -50,6 +45,20 @@ def init(engine):
     initialized = True
 
 
+def init(engine):
+    """
+    Initialize module. Argument engine is the multimedia framework object.
+    Engine can be Pygame, PyJ2D, or Pyjsdl.
+    Module initialized if Pygame can be imported.
+    """
+    if initialized:
+        return
+    _init(engine)
+    if engine.__name__ == 'pyjsdl':
+        from image import _load_default_images
+        _load_default_images()
+
+
 if engine:
-    init(engine)
+    _init(engine)
 
