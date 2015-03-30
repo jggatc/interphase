@@ -842,6 +842,25 @@ class Interface(engine.sprite.Sprite):
         else:
             return None
 
+    def process_event(self, clear=False):
+        """
+        Internally process event handlers.
+        Required if no call to framework event method such as event.get or event.pump.
+        Optional clear argument to remove events from framework event queue.
+        With scroll_button active, call panel update prior to framework event method calls.
+        """
+        if not clear:
+            engine.event.pump()
+        else:
+            engine.event.clear()
+
+    def get_event_queue(self):
+        """
+        Return interface event queue.
+        Event queue has mouse press events sequestered upon panel interaction with scroll_button active.
+        """
+        return self._event_queue
+
     def move_control(self, control=None, position=None, offset=None):
         """Move selected control. If no position supplied, use position of mouse pointer."""
         if not control:
