@@ -1139,7 +1139,7 @@ class Interface(engine.sprite.Sprite):
                         self._control_press['rtime'] = self._control_press['htime'] = engine.time.get_ticks()
                         return control_select, button_select
         else:
-            if (self._control_press['control'].rects[self._control_press['button']].collidepoint(pos)) and (self._control_press['control'].active):
+            if self._control_press['control'].active:
                 time = engine.time.get_ticks()
                 if (time-self._control_press['rtime']) > self._control_press['response']:
                     self._control_press['rtime'] = engine.time.get_ticks()
