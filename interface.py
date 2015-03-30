@@ -1067,14 +1067,6 @@ class Interface(engine.sprite.Sprite):
                     self._update_panel = True
         return self._panel_disabled
 
-    def _move_rect(self, rect):
-        """Update rects following panel move."""
-        self._panel_rect = self.image.get_rect(center=(self._x,self._y))
-        offset_x, offset_y = self._panel_rect[0], self._panel_rect[1]
-        rect[0], rect[1] = rect[0]+offset_x, rect[1]+offset_y
-        self._controls[ctrl].rects[btn] = rect
-        return rect
-
     def _panel_interaction(self):
         """Check for mouse interaction with panel."""
         self._pointer_position = engine.mouse.get_pos()
