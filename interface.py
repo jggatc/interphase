@@ -33,6 +33,7 @@ class Interface(engine.sprite.Sprite):
     _image_source = None
     _clipboard = None
     _clipboard_type = None
+    _event_queue = []
 
     def __init__(self,
         identity='Interface_Panel',
@@ -53,6 +54,7 @@ class Interface(engine.sprite.Sprite):
         button_size=(12,12),
         function_button='left',
         control_button='right',
+        scroll_button=None,
         font_color=(125,130,135),
         font_type=None,
         font_size=10,
@@ -107,6 +109,8 @@ class Interface(engine.sprite.Sprite):
         button_size: (x,y) button size <(12,12)>.
         function_button: placement of buttons of function_select <'left'>.
         control_button: placement of buttons of control_select <'right'>.
+        scroll_button: activate scroll wheel <None>.
+            - None,'vertical','horizontal','both'
         font_color: (r,g,b) font color of control text <(125,130,135)>.
         font_type: [] font type list <None>.
             None: default system font; []: use first font available.
@@ -184,6 +188,17 @@ class Interface(engine.sprite.Sprite):
             self._control_minsize = None
         self._control_size = control_size
         self._button_placement = { 'function_select':function_button, 'control_select':control_button, 'textbox':'right' }
+        if scroll_button:
+            if scroll_button == 'vertical':
+                self._scroll_button = set([4,5])
+            elif scroll_button == 'horizontal':
+                self._scroll_button = set([6,7])
+            else:
+                self._scroll_button = set([4,5,6,7])
+        else:
+            self._scroll_button = None
+        self._scroll_button_selected = {4:'_top', 5:'_bottom', 6:'_top', 7:'_bottom'}
+        self._control_events = 1
         if moveable:
             self._displayed = False
         else:
@@ -1127,14 +1142,39 @@ class Interface(engine.sprite.Sprite):
                                 break
         return control_interact, button_interact
 
+    def _control_scroll(self, pos, btn):
+        for control in self._controls:
+            if not self._controls[control].active or self._controls[control].control_type not in ['function_select', 'control_select', 'textbox']:
+                continue
+            for button in self._controls[control].rects:
+                if button.endswith('_bg'):
+                    continue
+                if self._controls[control].rects[button].collidepoint(pos):
+                    return control, control+self._scroll_button_selected[btn]
+        return None, None
+
     def _control_select(self, pos):
         """Check control selected."""
         if not self._displayed or not self._panel_active or self._panel_disabled:
             return None, None
-        button1 = engine.mouse.get_pressed()[0]
-        if not button1:
-            self._control_press['control'] = None
-            return None, None
+        if not engine.mouse.get_pressed()[0]:
+            if self._control_press['control']:
+                self._control_press['control'] = None
+            if not self._scroll_button:
+                return None, None
+            else:
+                self._event_queue[:] = engine.event.get(engine.MOUSEBUTTONDOWN)
+                scroll_event = None
+                for event in self._event_queue:
+                    if event.button in self._scroll_button:
+                        if not scroll_event:
+                            scroll_event = event.button
+                        else:
+                            self._control_events += 1
+                if scroll_event:
+                    return self._control_scroll(pos, scroll_event)
+                else:
+                    return None, None
         control_select = None
         button_select = None
         if not self._control_press['control']:
@@ -1181,8 +1221,14 @@ class Interface(engine.sprite.Sprite):
     def _control_action(self, control, button):
         """Does control action, returns button pressed and current control value."""
         if button:
-            button, value = self._controls[control]._action(button)
-            return button, value
+            if self._control_events == 1:
+                button, value = self._controls[control]._action(button)
+                return button, value
+            else:
+                for evt in range(self._control_events):
+                    button, value = self._controls[control]._action(button)
+                self._control_events = 1
+                return button, value
         else:
             return None, None
 

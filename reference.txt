@@ -1,5 +1,15 @@
 Interphase Module Reference
 
+The module adds interface panel functionality to a Pygame application. It was developed as a simple GUI with the goal to simulate a digital display panel. The module provides interface and control objects to design a panel, and numerous methods to manage the panel from the application code. Run interphase.py separately for an interface panel demo that is coded in demo.py.
+
+The module requires Python 2.5+ (http://www.python.org/) and Pygame 1.8+ (http://www.pygame.org/). Interphase module is also functional with PyJ2D (http://gatc.ca/projects/pyj2d/) and Pyjsdl (http://gatc.ca/projects/pyjsdl/) frameworks. The Interphase.init() and Interphase.get_init() methods are available for initialization of the alternate frameworks.
+
+To utilize the module, place the interphase folder in the path or within script folder, and import the module to the application with the statement 'import interphase'. A zip of the interphase folder can also be used with the statement "sys.path.insert(0,'./interphase_zipfile')" prior to import.
+
+To design an interface panel, interphase.Interface can be subclassed. Within the __init__() method call interphase.Interface.__init__(). Interface Object provides several methods to design and utilize an interface panel. Use add() to add controls to panel, place into a method called add_controls(); if added otherwise call activate() after to activate the panel. The program maintains the update of the panel including changes through the methods, however panel_update() can be used to force an update if required. If the Interface Object is subclassed, when overriding the update() method call interphase.Interface.update(). Interface interaction can be maintained with the InterfaceState object, that is returned by update() or get_state(), or through Pygame event queue checking for event.type interphase.EVENT['controlselect'] and interphase.EVENT['controlinteract'] with the attribute event.state that references the InterfaceState object. To turn the panel off, deactivate() sets state.active to false. The panel can be drawn to the display with the draw() method.
+
+Interface panel interaction requires event queue processing through Pygame event methods such as event.get/event.pump, or by the interface process_event method. When the interface scroll_button option is active, call the interface update method prior to Pygame event method calls; use get_event_queue method to retrieve mouse press events sequestered upon interface interaction with scroll_button active. 
+
 
 InterfaceState Object:
 
@@ -29,7 +39,7 @@ values:
 
 Interface Object methods:
 
-add, add_control, activate, deactivate, is_active, get_state, get_value, get_control, remove_control, enable_control, disable_control, update, panel_update, draw, clear, set_panel_display, get_id, set_panel_image, set_control_image, set_button_image, get_panel_image, get_default_image, move, set_moveable, is_moveable, set_label_display, is_label_display, get_size, get_position, move_control, get_control_move, set_control_move, set_control_moveable, is_control_moveable, set_tips_display, is_tips_display, get_pointer_position, set_pointer_interact, set_info_display, is_info_display, add_info, clear_info, is_update, set_update, set_panel_function, get_clipboard, set_clipboard.
+add, add_control, activate, deactivate, is_active, get_state, get_value, get_control, remove_control, enable_control, disable_control, update, panel_update, draw, clear, set_panel_display, get_id, set_panel_image, set_control_image, set_button_image, get_panel_image, get_default_image, move, set_moveable, is_moveable, set_label_display, is_label_display, get_size, get_position, move_control, get_control_move, set_control_move, set_control_moveable, is_control_moveable, set_tips_display, is_tips_display, get_pointer_position, set_pointer_interact, process_event, get_event_queue, set_info_display, is_info_display, add_info, clear_info, is_update, set_update, set_panel_function, get_clipboard, set_clipboard.
 
 
 Control Object methods:
@@ -72,6 +82,8 @@ control_size: '' global control size if control_minsize set <'min'>.
 button_size: (x,y) button size <(12,12)>.
 function_button: placement of buttons of function_select <'left'>.
 control_button: placement of buttons of control_select <'right'>.
+scroll_button: activate scroll wheel <None>.
+    - None,'vertical','horizontal','both'
 font_color: (r,g,b) font color of control text <(125,130,135)>.
 font_type: [] font type list <None>.
     - None: default system font; []: use first font available.

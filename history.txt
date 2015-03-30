@@ -134,4 +134,7 @@ InterfaceControl Class changes:
 -add interphase.init and interphase.get_init to initialize module.
 -add textbox clipboard functionality for PyJ2D and Pyjsdl via pyjsdl.display.textarea.
 -update textbox.get_text to properly return text.
+-update interface to maintain control hold if pointer moves off control.
+-add interface process_event and get_event_queue methods.
+-add scroll wheel functionality, activated with interface parameter scroll_button.
 
