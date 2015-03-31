@@ -23,7 +23,7 @@ class InterfaceDemo(interphase.Interface):
 
     def __init__(self):
         self.pygame_initiate()
-        interphase.Interface.__init__(self, position=(250,450), color=(43,50,58), size=(350,100), moveable=False, position_offset=(0,95), control_minsize=(25,25), control_size='auto', font_color=(175,180,185), tips_fontcolor=(175,180,185))
+        interphase.Interface.__init__(self, position=(250,450), color=(43,50,58), size=(350,100), moveable=False, position_offset=(0,95), control_minsize=(25,25), control_size='auto', font_color=(175,180,185), tips_fontcolor=(175,180,185), scroll_button='both')
         self.interfacedemo_initiate()
         self.update_rect = []
 
@@ -360,7 +360,7 @@ class InterfaceDoc(interphase.Interface):
     """
 
     def __init__(self, display):
-        interphase.Interface.__init__(self, identity='Interface_Doc', position=(250,200), color=(43,50,58), image='none', size=(480,360), screen=display.get_size(), font_color=(175,180,185), tips_display=False)
+        interphase.Interface.__init__(self, identity='Interface_Doc', position=(250,200), color=(43,50,58), image='none', size=(480,360), screen=display.get_size(), font_color=(175,180,185), tips_display=False, scroll_button='vertical')
         self.next_move = 0
         self.prev_move = 0
         self.page_lines = 17
