@@ -137,4 +137,5 @@ InterfaceControl Class changes:
 -update interface to maintain control hold if pointer moves off control.
 -add interface process_event and get_event_queue methods.
 -add scroll wheel functionality, activated with interface parameter scroll_button.
+-update scroll config for numeric control.
 

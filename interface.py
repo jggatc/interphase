@@ -198,6 +198,7 @@ class Interface(engine.sprite.Sprite):
         else:
             self._scroll_button = None
         self._scroll_button_selected = {4:'_top', 5:'_bottom', 6:'_top', 7:'_bottom'}
+        self._scroll_button_selected_alt = {4:'_top', 5:'_bottom', 6:'_bottom', 7:'_top'}
         self._control_events = 1
         if moveable:
             self._displayed = False
@@ -1150,7 +1151,10 @@ class Interface(engine.sprite.Sprite):
                 if button.endswith('_bg'):
                     continue
                 if self._controls[control].rects[button].collidepoint(pos):
-                    return control, control+self._scroll_button_selected[btn]
+                    if not self._controls[control].listing[0][:-2] == '__numeric':  #TODO: encapsulate in control
+                        return control, control+self._scroll_button_selected[btn]
+                    else:
+                        return control, control+self._scroll_button_selected_alt[btn]
         return None, None
 
     def _control_select(self, pos):
