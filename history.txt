@@ -138,4 +138,5 @@ InterfaceControl Class changes:
 -add interface process_event and get_event_queue methods.
 -add scroll wheel functionality, activated with interface parameter scroll_button.
 -update scroll config for numeric control.
+-update interface scroll_button to use hashset when set not available in earlier jython releases.
 

@@ -189,12 +189,21 @@ class Interface(engine.sprite.Sprite):
         self._control_size = control_size
         self._button_placement = { 'function_select':function_button, 'control_select':control_button, 'textbox':'right' }
         if scroll_button:
-            if scroll_button == 'vertical':
-                self._scroll_button = set([4,5])
-            elif scroll_button == 'horizontal':
-                self._scroll_button = set([6,7])
-            else:
-                self._scroll_button = set([4,5,6,7])
+            try:
+                if scroll_button == 'vertical':
+                    self._scroll_button = set([4,5])
+                elif scroll_button == 'horizontal':
+                    self._scroll_button = set([6,7])
+                else:
+                    self._scroll_button = set([4,5,6,7])
+            except NameError:   #set module not available
+                from java.util import HashSet
+                if scroll_button == 'vertical':
+                    self._scroll_button = HashSet([4,5])
+                elif scroll_button == 'horizontal':
+                    self._scroll_button = HashSet([6,7])
+                else:
+                    self._scroll_button = HashSet([4,5,6,7])
         else:
             self._scroll_button = None
         self._scroll_button_selected = {4:'_top', 5:'_bottom', 6:'_top', 7:'_bottom'}
@@ -1164,7 +1173,7 @@ class Interface(engine.sprite.Sprite):
         if not engine.mouse.get_pressed()[0]:
             if self._control_press['control']:
                 self._control_press['control'] = None
-            if not self._scroll_button:
+            if self._scroll_button is None:
                 return None, None
             else:
                 self._event_queue[:] = engine.event.get(engine.MOUSEBUTTONDOWN)
