@@ -1,19 +1,24 @@
 #!/usr/bin/env python
 from __future__ import division
 
+#Interphase - Copyright (C) 2009 James Garnon <http://gatc.ca/>
+#Released under the MIT License <http://opensource.org/licenses/MIT>
+#
 #"""
 #Interphase Demo
 #
 #Interphase Module
-#Download Site: http://gatc.ca
+#Project Site: http://gatc.ca/
 #"""
-
 
 import interphase
 import pygame
 import random
 
 __docformat__ = 'restructuredtext'
+
+
+module_info = """Interphase Module\n\nThe module adds interface panel functionality to a Pygame application. It was developed as a simple GUI with the goal to simulate a digital display panel. The module provides interface and control objects to design a panel, and numerous methods to manage the panel from the application code."""
 
 
 class InterfaceDemo(interphase.Interface):
@@ -32,7 +37,6 @@ class InterfaceDemo(interphase.Interface):
         Control_list = ['Intro Textbox', 'Control 1', 'Control 2', 'Layout', 'Puzzle', 'Doc', 'Exit']
         Control_tip = ['Interphase Intro', 'Control Panel 1', 'Control Panel 2', 'Control Placement', 'Sliding Control', 'Click to Exit']
         Control_link = [ ['Interphase'], ['Select1'], ['Setting1', 'Setting2', 'Files'], ['Moveable'],['Puzzle'], ['Doc'] , ['Interphase_url']]
-        intro_txt = ''.join( [line for line in interphase.__doc__.splitlines(True)][1:4] )
         self.add(
             identity = 'Control',
             control_type = 'function_select',
@@ -48,12 +52,12 @@ class InterfaceDemo(interphase.Interface):
             identity = 'Interphase',
             control_type = 'textbox',
             position = (210,62),
-            size = (218,64),
+            size = (219,64),
             color = (49,57,65),
             font_color = (125,175,200),
             font_size = 12,
             font_type = 'arial',
-            control_list = [intro_txt],
+            control_list = [module_info],
             text_paste = True,
             label_display = False)
         self.add(
@@ -380,13 +384,12 @@ class InterfaceDoc(interphase.Interface):
         self.textbox.set_value(doc)
 
     def generate_doc(self):
-        docs = []
-        docs.append( interphase.__doc__ )
-        docs.append('\n\n')
-        docs.append( ''.join([line[8:] for line in interphase.Interface.__init__.__doc__.splitlines(True)]) )
-        docs.append('\n\n')
-        docs.append( ''.join([line[8:] for line in interphase.Control.__init__.__doc__.splitlines(True)]) )
-        docs = ''.join(docs)
+        try:
+            f = open('guide.txt', 'r')
+        except IOError:
+            return module_info+'\n\nDocumentation in guide.txt unable to be accessed.'
+        docs = f.read()
+        f.close()
         return docs
 
     def browse(self, control, value=None):
