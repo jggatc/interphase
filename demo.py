@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division
 
 #Interphase - Copyright (C) 2009 James Garnon <http://gatc.ca/>
 #Released under the MIT License <http://opensource.org/licenses/MIT>
@@ -11,9 +10,13 @@ from __future__ import division
 #Project Site: http://gatc.ca/
 #"""
 
-import interphase
-import pygame
+from __future__ import division
 import random
+import pygame
+import interphase
+
+interphase.init(pygame)
+
 
 __docformat__ = 'restructuredtext'
 
@@ -27,15 +30,22 @@ class InterfaceDemo(interphase.Interface):
     """
 
     def __init__(self):
-        self.pygame_initiate()
-        interphase.Interface.__init__(self, position=(250,450), color=(43,50,58), size=(350,100), moveable=False, position_offset=(0,95), control_minsize=(25,25), control_size='auto', font_color=(175,180,185), tips_fontcolor=(175,180,185), scroll_button='both')
-        self.interfacedemo_initiate()
+        self.screen, self.background, self.clock = self.initiate()
+        interphase.Interface.__init__(self, position=(self.screen.get_width()//2,self.screen.get_height()-50), color=(43,50,58), size=(350,100), moveable=False, position_offset=(0,95), control_minsize=(25,25), control_size='auto', font_color=(175,180,185), tips_fontcolor=(175,180,185), scroll_button='both')
+        self.puzzle = False
+        self.puzzle_init = False
+        self.puzzle_panel = None
+        self.puzzle_interface = None
+        self.doc_init = False
+        self.doc_browse = False
+        self.doc_interface = None
+        self.doc_panel = None
         self.update_rect = []
 
     def add_controls(self):
         """Add interface controls."""
         Control_list = ['Intro Textbox', 'Control 1', 'Control 2', 'Layout', 'Puzzle', 'Doc', 'Exit']
-        Control_tip = ['Interphase Intro', 'Control Panel 1', 'Control Panel 2', 'Control Placement', 'Sliding Control', 'Click to Exit']
+        Control_tip = ['Interphase Intro', 'Control Panel 1', 'Control Panel 2', 'Control Placement', 'Sliding Control', 'Interphase Doc', 'Click to Exit']
         Control_link = [ ['Interphase'], ['Select1'], ['Setting1', 'Setting2', 'Files'], ['Moveable'],['Puzzle'], ['Doc'] , ['Interphase_url']]
         self.add(
             identity = 'Control',
@@ -174,25 +184,16 @@ class InterfaceDemo(interphase.Interface):
         self.get_control('Previous').add_action(self.doc_control)
         self.get_control('Interphase_url').add_action(self.launch_url)
 
-    def pygame_initiate(self):
-        """Initiate pygame."""
-        pygame.display.init()   #pygame.init()
-        pygame.display.set_caption('Interphase')
-        self.screen = pygame.display.set_mode((500,500))
-        self.background = pygame.Surface((500,500))
-        self.clock = pygame.time.Clock()
-        pygame.display.flip()
-
-    def interfacedemo_initiate(self):
+    def initiate(self):
         """Initiate demo."""
-        self.puzzle = False
-        self.puzzle_init = False
-        self.puzzle_panel = None
-        self.puzzle_interface = None
-        self.doc_init = False
-        self.doc_browse = False
+        pygame.display.set_caption('Interphase')
+        screen = pygame.display.get_surface()
+        background = pygame.Surface(screen.get_size())
+        clock = pygame.time.Clock()
+        pygame.event.set_blocked(pygame.MOUSEMOTION)
+        return screen, background, clock
 
-    def pygame_check(self):
+    def event_check(self):
         """Check user input."""
         terminate = False
         for event in pygame.event.get():
@@ -209,11 +210,13 @@ class InterfaceDemo(interphase.Interface):
         return terminate
 
     def doc_control(self, control, value):
+        """Documentation browse control."""
         if control in ['Next', 'Previous']:
             if self.doc_browse:
                 self.doc_interface.browse(control)
 
     def launch_url(self, control=None, value=None):
+        """Launch module webpage."""
         try:
             import webbrowser
             webbrowser.open(value.split()[1])
@@ -271,7 +274,7 @@ class InterfaceDemo(interphase.Interface):
                     self.puzzle_init = False
                     self.puzzle = False
                     state.controls['Control'].set_active(True)
-                    rect = self.screen.blit(self.background, (0,0), (0,0,500,400))
+                    rect = self.screen.blit(self.background, (0,0), (0,0,self.screen.get_width(),self.screen.get_height()-100))
                     self.update_rect.append(rect)
             elif state.control == '__Help':
                 self.set_info_display()
@@ -293,7 +296,7 @@ class InterfaceDemo(interphase.Interface):
                         self.doc_panel = None
                         self.doc_init = False
                         self.doc_browse = False
-                        rect = self.screen.blit(self.background, (0,0), (0,0,500,400))
+                        rect = self.screen.blit(self.background, (0,0), (0,0,self.screen.get_width(),self.screen.get_height()-100))
                         self.update_rect.append(rect)
             elif state.control == 'Control':
                 if self.doc_browse:
@@ -303,7 +306,7 @@ class InterfaceDemo(interphase.Interface):
                     self.doc_panel = None
                     self.doc_init = False
                     self.doc_browse = False
-                    rect = self.screen.blit(self.background, (0,0), (0,0,500,400))
+                    rect = self.screen.blit(self.background, (0,0), (0,0,self.screen.get_width(),self.screen.get_height()-100))
                     self.update_rect.append(rect)
         if self.is_control_moveable():
             self.move_control()
@@ -353,7 +356,8 @@ class InterfaceDemo(interphase.Interface):
             else:
                 if state.controls['__Position'].get_value():
                     state.controls['__Position'].set_value('')
-        if self.pygame_check():
+        terminate = self.event_check()
+        if terminate:
             self.deactivate()
         return state
 
@@ -364,48 +368,57 @@ class InterfaceDoc(interphase.Interface):
     """
 
     def __init__(self, display):
-        interphase.Interface.__init__(self, identity='Interface_Doc', position=(250,200), color=(43,50,58), image='none', size=(480,360), screen=display.get_size(), font_color=(175,180,185), tips_display=False, scroll_button='vertical')
+        w, h = display.get_size()
+        interphase.Interface.__init__(self, identity='Interface_Doc', position=(0.5,(h//2)-50), color=(43,50,58), image='none', size=(int(w*0.94),int(h*0.55)), screen=(w,h), font_color=(175,180,185), tips_display=False, scroll_button='vertical')
+        self.textbox = self.get_control('Doc')
+        self.textbox.set_value(self.generate_doc())
+        self.page_lines = self.textbox.get_line_max()
+        self.line_step = self.page_lines
         self.next_move = 0
         self.prev_move = 0
-        self.page_lines = 17
 
     def add_controls(self):
-        self.textbox = self.add(
+        """Add interface controls."""
+        self.add(
             identity = 'Doc',
             control_type = 'textbox',
             position = (0.5,0.5),
-            size = (446,326),
+            size = (self.get_size()[0]-34,self.get_size()[1]-34),
             color = (19,22,26),
             font_color = (150,150,150),
-            font_size = 14,
+            font_size = 12,
             font_type = 'arial',
             label_display = False)
-        doc = self.generate_doc()
-        self.textbox.set_value(doc)
 
     def generate_doc(self):
+        """Retrieve documentation."""
         try:
             f = open('guide.txt', 'r')
+            doc = f.read()
         except IOError:
-            return module_info+'\n\nDocumentation in guide.txt unable to be accessed.'
-        docs = f.read()
-        f.close()
-        return docs
+            doc = None
+        else:
+            f.close()
+        if not doc:
+            doc = module_info+'\n\nDocumentation in guide.txt unable to be accessed.'
+        return doc
 
     def browse(self, control, value=None):
+        """Documentation browse control."""
         if control == 'Next':
             self.next_move = self.page_lines
         elif control == 'Previous':
             self.prev_move = self.page_lines
 
     def update(self):
+        """Documentation interface update."""
         interphase.Interface.update(self)
         if self.next_move:
-            self.textbox.next()
-            self.next_move -= 1
+            self.textbox.next(self.line_step)
+            self.next_move -= self.line_step
         elif self.prev_move:
-            self.textbox.previous()
-            self.prev_move -= 1
+            self.textbox.previous(self.line_step)
+            self.prev_move -= self.line_step
 
 
 class InterfacePuzzle(interphase.Interface):
@@ -415,7 +428,8 @@ class InterfacePuzzle(interphase.Interface):
 
     def __init__(self, display):
         self.puzzle_initiate()
-        interphase.Interface.__init__(self, identity='Interface_Puzzle', position=(0.5,0.5), color=(23,30,38), size=(180,180), screen=display.get_size(), font_color=(175,180,185), tips_fontcolor=(255,255,255))
+        w, h = display.get_size()
+        interphase.Interface.__init__(self, identity='Interface_Puzzle', position=(0.5,(h//2)-50), color=(23,30,38), size=(180,180), screen=(w,h), font_color=(175,180,185), tips_fontcolor=(255,255,255))
         self.puzzle_outline()
 
     def add_controls(self):
@@ -452,7 +466,8 @@ class InterfacePuzzle(interphase.Interface):
         self.grid_xy = (30,30)
         self.control_move = None
         self.move_offset = None
-        self.move_rate = self.grid_size[0]//4
+        self.move_steps = 2
+        self.move_rate = self.grid_size[0]//self.move_steps
         self.move_step = 0
         self.last_move = None
         self.count = 0
@@ -513,7 +528,7 @@ class InterfacePuzzle(interphase.Interface):
 
     def move(self):
         """Puzzle control move."""
-        if self.move_step < 4:
+        if self.move_step < self.move_steps:
             self.move_control(self.control_move, offset=self.move_offset)
             self.move_step += 1
             complete = False
@@ -557,6 +572,11 @@ class InterfacePuzzle(interphase.Interface):
             return
 
 
+def setup(width,height):
+    pygame.display.init()   #pygame.init()
+    pygame.display.set_mode((width,height))
+
+
 def run():
     panel = InterfaceDemo()
     run_demo = True
@@ -571,10 +591,13 @@ def run():
                 panel.update_rect = []
         else:
             run_demo = False
+    pygame.quit()
 
 
 def main():
+    setup(400,320)
     run()
+
 
 if __name__ == '__main__':
     main()
