@@ -247,6 +247,10 @@ class Interface(engine.sprite.Sprite):
         self._pointer_position = (0,0)
         self._pointer_interact = pointer_interact   #detect control hover
         self._clock = engine.time.Clock()
+        for i in range(100):    #issue in _moveable_panel division when get_fps() return 0.0
+            if 30 <= self._clock.get_fps() < 100:
+                break
+            self._clock.tick(30)
         self._update_panel = True   #set for panel update
         self._initial_update = 10   #panel updates for short duration
         self._panel_function = []   #list of panel functions to run on panel update
