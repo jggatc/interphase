@@ -12,10 +12,10 @@
 
 from __future__ import division
 import random
-import pygame
+import pygame as engine
 import interphase
 
-interphase.init(pygame)
+interphase.init(engine)
 
 
 __docformat__ = 'restructuredtext'
@@ -186,25 +186,25 @@ class InterfaceDemo(interphase.Interface):
 
     def initiate(self):
         """Initiate demo."""
-        pygame.display.set_caption('Interphase')
-        screen = pygame.display.get_surface()
-        background = pygame.Surface(screen.get_size())
-        clock = pygame.time.Clock()
-        pygame.event.set_blocked(pygame.MOUSEMOTION)
+        engine.display.set_caption('Interphase')
+        screen = engine.display.get_surface()
+        background = engine.Surface(screen.get_size())
+        clock = engine.time.Clock()
+        engine.event.set_blocked(engine.MOUSEMOTION)
         return screen, background, clock
 
     def event_check(self):
         """Check user input."""
         terminate = False
-        for event in pygame.event.get():
+        for event in engine.event.get():
             if event.type == interphase.EVENT['controlselect']:
                 if event.state.control == 'Control' and event.state.button == 'Control':
                     if event.state.value == 'Exit':
                         terminate = True
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+            elif event.type == engine.KEYDOWN:
+                if event.key == engine.K_ESCAPE:
                     terminate = True
-            elif event.type == pygame.QUIT:
+            elif event.type == engine.QUIT:
                 terminate = True
         self.clock.tick(40)
         return terminate
@@ -316,7 +316,7 @@ class InterfaceDemo(interphase.Interface):
         if self.puzzle:
             if not self.puzzle_init:
                 self.puzzle_interface = InterfacePuzzle(self.screen)
-                self.puzzle_panel = pygame.sprite.RenderUpdates(self.puzzle_interface)
+                self.puzzle_panel = engine.sprite.RenderUpdates(self.puzzle_interface)
                 if state.values['Select1'] == 'OFF':
                     self.puzzle_interface.set_control_image('none')
                     self.puzzle_interface.panel_update()
@@ -328,7 +328,7 @@ class InterfaceDemo(interphase.Interface):
         if self.doc_browse:
             if not self.doc_init:
                 self.doc_interface = InterfaceDoc(self.screen)
-                self.doc_panel = pygame.sprite.RenderUpdates(self.doc_interface)
+                self.doc_panel = engine.sprite.RenderUpdates(self.doc_interface)
                 if state.values['Select1'] == 'OFF':
                     self.doc_interface.set_control_image('none')
                     self.doc_interface.set_button_image('none')
@@ -478,7 +478,7 @@ class InterfacePuzzle(interphase.Interface):
     def puzzle_outline(self):
         """Draw outline around puzzle controls."""
         panel_image = self.get_panel_image(change=True)
-        pygame.draw.rect(panel_image, (14,20,27), (10,10,160,160), 2)
+        engine.draw.rect(panel_image, (14,20,27), (10,10,160,160), 2)
 
     def init(self):
         """Shuffle puzzle controls."""
@@ -553,7 +553,7 @@ class InterfacePuzzle(interphase.Interface):
             if complete:
                 self.grid_initialize = False
                 self.puzzle_solving = True
-                self.grid_timer = pygame.time.get_ticks()
+                self.grid_timer = engine.time.get_ticks()
         if self.puzzle_solving:
             if self.control_move:
                 complete = self.move()
@@ -561,7 +561,7 @@ class InterfacePuzzle(interphase.Interface):
                     success = self.puzzle_final()
                     if success:
                         self.puzzle_solving = False
-                        time = int((pygame.time.get_ticks()-self.grid_timer)/1000)
+                        time = int((engine.time.get_ticks()-self.grid_timer)/1000)
                         control_start = self.get_control('Start')
                         control_start.set_value(str(time)+'s')
                         control_start.set_active(True)
@@ -573,8 +573,8 @@ class InterfacePuzzle(interphase.Interface):
 
 
 def setup(width,height):
-    pygame.display.init()   #pygame.init()
-    pygame.display.set_mode((width,height))
+    engine.display.init()
+    engine.display.set_mode((width,height))
 
 
 def run():
@@ -587,11 +587,11 @@ def run():
                 panel.clear(panel.screen,panel.background)
                 panel.update_rect.extend( panel.draw(panel.screen) )
             if panel.update_rect:
-                pygame.display.update(panel.update_rect)
+                engine.display.update(panel.update_rect)
                 panel.update_rect = []
         else:
             run_demo = False
-    pygame.quit()
+    engine.quit()
 
 
 def main():

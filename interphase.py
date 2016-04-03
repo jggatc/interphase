@@ -21,27 +21,13 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
 
-__docformat__ = 'restructuredtext'
-
-try:
-    import pygame as engine
-    import env
-    env.engine = engine
-    from interface import Interface, EVENT
-    from control import Control, FunctionControl, Label, Textbox
-    from util import Text, load_image
-    from version import __version__
-except ImportError:
-    engine = None
-
-import warnings
-warnings.filterwarnings("ignore")
+from __init__ import init, get_init, Interface, EVENT, Control, FunctionControl, Label, Textbox, Text, load_image, __version__
 
 
 def main():
     try:
         import demo
-        demo.run()
+        demo.main()
     except ImportError:
         print("Warning: demo.py not found.")
 
