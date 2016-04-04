@@ -39,7 +39,7 @@ values:
 
 Interface Object methods:
 
-add, add_control, activate, deactivate, is_active, get_state, get_value, get_control, remove_control, enable_control, disable_control, update, panel_update, draw, clear, set_panel_display, get_id, set_panel_image, set_control_image, set_button_image, get_panel_image, get_default_image, move, set_moveable, is_moveable, set_label_display, is_label_display, get_size, get_position, move_control, get_control_move, set_control_move, set_control_moveable, is_control_moveable, set_tips_display, is_tips_display, get_pointer_position, set_pointer_interact, process_event, get_event_queue, set_info_display, is_info_display, add_info, clear_info, is_update, set_update, set_panel_function, get_clipboard, set_clipboard.
+add, add_control, activate, deactivate, is_active, get_state, get_value, get_control, remove_control, enable_control, disable_control, update, panel_update, draw, clear, set_panel_display, is_panel_display, get_id, set_panel_image, set_control_image, set_button_image, get_panel_image, get_default_image, move, set_moveable, is_moveable, set_label_display, is_label_display, get_size, get_position, move_control, get_control_move, set_control_move, set_control_moveable, is_control_moveable, set_tips_display, is_tips_display, get_pointer_position, set_pointer_interact, process_event, get_event_queue, set_info_display, is_info_display, add_info, clear_info, is_update, set_update, set_panel_function, get_clipboard, set_clipboard.
 
 
 Control Object methods:

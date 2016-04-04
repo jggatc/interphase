@@ -751,6 +751,10 @@ class Interface(engine.sprite.Sprite):
             self._controls[ctrl].button, self._controls[ctrl].rects = self._controls[ctrl]._define_buttons(control_type, size, color, fill)
         self._update_panel = True
 
+    def is_panel_display(self):
+        """Check whether panel controls displayed or toggled with pointer interaction."""
+        return self._panel_display
+
     def set_panel_display(self, setting='Toggle'):
         """Set whether panel display toggled with pointer interaction."""
         if setting == 'Toggle':
