@@ -756,12 +756,14 @@ class Interface(engine.sprite.Sprite):
         return self._panel_display
 
     def set_panel_display(self, setting='Toggle'):
-        """Set whether panel display toggled with pointer interaction."""
+        """Set panel controls displayed or toggled with pointer interaction."""
         if setting == 'Toggle':
             self._panel_display = not self._panel_display
+            self._panel_active = True
             return self._panel_display
         elif setting in (True, False):
             self._panel_display = setting
+            self._panel_active = True
             return self._panel_display
         else:
             return None
@@ -1135,6 +1137,8 @@ class Interface(engine.sprite.Sprite):
                 self._panel_interact = True
                 self._panel_active = True
                 self._displayed = True
+                if not self._panel_display:
+                    self._update_panel = True
         return self._panel_interact, self._pointer_position
 
     def _control_interact(self, pos):
