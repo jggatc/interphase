@@ -741,8 +741,8 @@ class Interface(engine.sprite.Sprite):
     def move(self, x, y):
         """Move panel to new position x,y."""
         self._x, self._y = x, y
-        self._panel_rect.x = self._x-(self.width//2)
-        self._panel_rect.y = self._y-(self.height//2)
+        self._panel_rect.x = self._x-(self._size[0]//2)
+        self._panel_rect.y = self._y-(self._size[1]//2)
         for ctrl in self._controls:
             control_type = self._controls[ctrl].control_type
             size = self._controls[ctrl].size

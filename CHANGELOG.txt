@@ -1,7 +1,8 @@
 0.87_dev
 -update interface to address issue in move method when get_fps return zero.
--add is_panel_display to check panel controls displayed.
--update set_panel_display to ensure display updates.
+-add interface.is_panel_display to check panel controls displayed.
+-update interface.set_panel_display to ensure display updates.
+-update interface.move to properly access panel size.
 
 0.87    2015-04-12
 -update Text.tprint to use rendered character cache.
