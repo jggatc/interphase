@@ -2,10 +2,10 @@
 #Released under the MIT License <http://opensource.org/licenses/MIT>
 
 from __future__ import division
-from control import Control, FunctionControl, Label, Textbox
-from util import Text, load_image
 import os
-from env import engine
+from interphase.control import Control, FunctionControl, Label, Textbox
+from interphase.util import Text, load_image
+from interphase.env import engine
 
 __docformat__ = 'restructuredtext'
 
@@ -455,7 +455,7 @@ class Interface(engine.sprite.Sprite):
     def _default_image(self):
         """Set default images."""
         try:
-            from image import _image_decode
+            from interphase.image import _image_decode
             image_obj = _image_decode()
         except:
             image_obj = {}

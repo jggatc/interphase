@@ -12,7 +12,7 @@ __docformat__ = 'restructuredtext'
 
 
 def _load_default_images():
-    import env
+    from interphase import env
     try:
         env.engine.display.setup_images([(i,_image[i]) for i in _image])
     except AttributeError:

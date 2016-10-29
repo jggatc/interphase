@@ -3,7 +3,7 @@
 
 from __future__ import division
 import os
-from env import engine
+from interphase.env import engine
 
 __docformat__ = 'restructuredtext'
 

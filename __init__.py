@@ -40,12 +40,12 @@ def get_init():
 
 def _init(engine):
     global Interface, EVENT, Control, FunctionControl, Label, Textbox, Text, load_image, __version__, initialized
-    import env
+    from interphase import env
     env.engine = engine
-    from interface import Interface, EVENT
-    from control import Control, FunctionControl, Label, Textbox
-    from util import Text, load_image
-    from version import __version__
+    from interphase.interface import Interface, EVENT
+    from interphase.control import Control, FunctionControl, Label, Textbox
+    from interphase.util import Text, load_image
+    from interphase.version import __version__
     initialized = True
 
 
@@ -59,7 +59,7 @@ def init(engine):
         return
     _init(engine)
     if engine.__name__ == 'pyjsdl':
-        from image import _load_default_images
+        from interphase.image import _load_default_images
         _load_default_images()
 
 

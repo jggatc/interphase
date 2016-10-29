@@ -3,6 +3,7 @@
 -add interface.is_panel_display to check panel controls displayed.
 -update interface.set_panel_display to ensure display updates.
 -update interface.move to properly access panel size.
+-revise with absolute import statements.
 
 0.87    2015-04-12
 -update Text.tprint to use rendered character cache.
