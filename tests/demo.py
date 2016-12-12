@@ -11,6 +11,7 @@
 #"""
 
 from __future__ import division
+import os
 import random
 import pygame as engine
 import interphase
@@ -393,7 +394,7 @@ class InterfaceDoc(interphase.Interface):
     def generate_doc(self):
         """Retrieve documentation."""
         try:
-            f = open('guide.txt', 'r')
+            f = open(os.path.join('docs', 'guide.txt'), 'r')
             doc = f.read()
         except IOError:
             doc = None
