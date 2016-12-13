@@ -391,10 +391,10 @@ class Text(object):
         self.tprint()
 
 
-def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, colorkey=None, errorhandle=True, errorreport=True):
+def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, colorkey=None, errorhandle=True):
     """
     Load image from file.
-    Arguments include the image filename, the number of image frames in an image strip, the image path, zipobj for image in a zip file, fileobj for image in a file-like object, image colorkey, errorhandle and errorreport for exception handling.
+    Arguments include the image filename, the number of image frames in an image strip, the image path, zipobj for image in a zip file, fileobj for image in a file-like object, image colorkey, and errorhandle for exception handling.
     """
     def convert_image(image, colorkey):
         if image.get_alpha():
@@ -409,19 +409,19 @@ def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, color
     if zipobj:
         import zipfile
         try:
-            import cStringIO
+            from io import BytesIO
         except ImportError:
-            import StringIO as cStringIO
+            from StringIO import StringIO as BytesIO
         if isinstance(zipobj, str):
             if path:
                 data_file = os.path.join(path, zipobj)
             else:
                 data_file = zipobj
             dat = zipfile.ZipFile(data_file)
-            fileobj = cStringIO.StringIO(dat.open(filename).read())
+            fileobj = BytesIO(dat.open(filename).read())
             dat.close()
         else:
-            fileobj = cStringIO.StringIO(zipobj.open(filename).read())
+            fileobj = BytesIO(zipobj.open(filename).read())
         full_name = fileobj
         namehint = filename
     elif fileobj:
@@ -450,12 +450,10 @@ def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, color
                 image_frame = convert_image(image_frame, colorkey)
                 images.append(image_frame)
             return images
-    except engine.error, message:
+    except engine.error:
         if errorhandle:
             raise
         else:
-            if errorreport:
-                print(message)
             raise IOError
             return None
 

@@ -458,10 +458,11 @@ class InterfacePuzzle(interphase.Interface):
 
     def puzzle_initiate(self):
         """Initiate puzzle."""
-        self.grid_positions = [(y,x) for x in xrange(4) for y in xrange(4)]
+        self.grid_positions = [(y,x) for x in range(4) for y in range(4)]
         self.grid = {}
         for index, pos in enumerate(self.grid_positions):
             self.grid[pos] = str(index+1)
+        self.grid_id = [str(i) for i in range(1,16)]
         self.grid_blank = (3,3)
         self.grid_size = (40,40)
         self.grid_xy = (30,30)
@@ -485,11 +486,9 @@ class InterfacePuzzle(interphase.Interface):
         """Shuffle puzzle controls."""
         ctrl = self.get_control()
         next = {}
-        ids = [str(i) for i in range(1,16)]
-        try:
+        ids = self.grid_id[:]
+        if self.last_move:
             ids.remove(self.last_move)
-        except ValueError:
-            pass
         random.shuffle(ids)
         for id in ids:
             pos = (ctrl[id].position[0]-self.grid_xy[0]+(ctrl[id].size[0]//2))//ctrl[id].size[0], (ctrl[id].position[1]-self.grid_xy[1]+(ctrl[id].size[1]//2))//ctrl[id].size[1]
@@ -519,8 +518,7 @@ class InterfacePuzzle(interphase.Interface):
         """Check if puzzle is complete."""
         controls = self.get_control()
         success = True
-        for ctrl_id in xrange(1,16):
-            id = str(ctrl_id)
+        for id in self.grid_id:
             pos = (controls[id].position[0]-self.grid_xy[0]+(controls[id].size[0]//2))//controls[id].size[0], (controls[id].position[1]-self.grid_xy[1]+(controls[id].size[1]//2))//controls[id].size[1]
             if controls[id].value != self.grid[pos]:
                 success = False
@@ -562,7 +560,7 @@ class InterfacePuzzle(interphase.Interface):
                     success = self.puzzle_final()
                     if success:
                         self.puzzle_solving = False
-                        time = int((engine.time.get_ticks()-self.grid_timer)/1000)
+                        time = ( engine.time.get_ticks() - self.grid_timer ) // 1000
                         control_start = self.get_control('Start')
                         control_start.set_value(str(time)+'s')
                         control_start.set_active(True)

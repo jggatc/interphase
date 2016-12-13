@@ -617,11 +617,11 @@ class Interface(engine.sprite.Sprite):
 
     def get_clipboard(self):
         """Retrieve text from clipboard."""
-        raise AttributeError, "clipboard unavailable"
+        raise AttributeError("clipboard unavailable")
 
     def set_clipboard(self, text):
         """Save text to clipboard."""
-        raise AttributeError, "clipboard unavailable"
+        raise AttributeError("clipboard unavailable")
 
     def _clipboard_init(self):
         if not Interface._clipboard:
@@ -631,7 +631,10 @@ class Interface(engine.sprite.Sprite):
                 Interface._clipboard_type = 'gtk'
             except ImportError:
                 try:
-                    from Tkinter import Tk
+                    try:
+                        from tkinter import Tk
+                    except ImportError:
+                        from Tkinter import Tk
                     Interface._clipboard = Tk()
                     Interface._clipboard.withdraw()
                     Interface._clipboard_type = 'tk'

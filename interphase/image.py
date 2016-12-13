@@ -3,9 +3,9 @@
 
 import base64
 try:
-    import cStringIO
+    from io import BytesIO
 except ImportError:
-    import StringIO as cStringIO
+    from StringIO import StringIO as BytesIO
 import sys
 
 __docformat__ = 'restructuredtext'
@@ -22,7 +22,7 @@ def _load_default_images():
 def _image_encode(image_file):
     """Encode image to base64 encoded string."""
     image = file(image_file, 'r')
-    image_obj = cStringIO.StringIO(image.read())
+    image_obj = BytesIO(image.read())
     image.close()
     try:
         image_dat = base64.b64encode(image_obj.getvalue())
@@ -43,7 +43,7 @@ def _image_decode(image=None):
             image_dat = base64.b64decode(_image[image])
         except AttributeError:
             image_dat = base64.decodestring(_image[image])
-        image_obj = cStringIO.StringIO(image_dat)
+        image_obj = BytesIO(image_dat)
         return image_obj
     else:
         image_objs = {}
@@ -52,7 +52,7 @@ def _image_decode(image=None):
                 image_dat = base64.b64decode(_image[image])
             except AttributeError:
                 image_dat = base64.decodestring(_image[image])
-            image_objs[image[:-4]] = ( image, cStringIO.StringIO(image_dat) )
+            image_objs[image[:-4]] = ( image, BytesIO(image_dat) )
         return image_objs
 
 
