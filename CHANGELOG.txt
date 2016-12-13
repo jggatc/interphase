@@ -5,7 +5,7 @@
 -update interface.move to properly access panel size.
 -revise with absolute import statements.
 -revise module structure.
--update for py2/py3 compatibility.
+-update for python 2/3 compatibility.
 
 0.87    2015-04-12
 -update Text.tprint to use rendered character cache.

@@ -20,11 +20,9 @@ class Interface(engine.sprite.Sprite):
     """
     **Interface Object**
 
-    To design an interface panel, interphase.Interface can be subclassed. Within the __init__() method call interphase.Interface.__init__(). Interface Object provides several methods to design and utilize an interface panel. Use add() to add controls to panel, place into a method called add_controls(); if added otherwise call activate() after to activate the panel. The program maintains the update of the panel including changes through the methods, however panel_update() can be used to force an update if required. If the Interface Object is subclassed, when overriding the update() method call interphase.Interface.update().
+    To design an interface panel, interphase.Interface can be subclassed. Within the __init__() method call interphase.Interface.__init__(). Interface Object provides methods to design and utilize an interface panel. Use add() to add controls to panel, place into a method called add_controls(); if controls added otherwise call activate() to activate the panel. The module maintains the update of the panel including changes through the methods, however panel_update() can be used to force an update if required. If the Interface Object is subclassed, when overriding the update() method call interphase.Interface.update().
     
     Interface interaction can be maintained with the InterfaceState object, that is returned by update() or get_state(), or through Pygame event queue checking for event.type interphase.EVENT[ 'controlselect' ] and interphase.EVENT[ 'controlinteract' ] with the attribute event.state that references the InterfaceState object. To turn the panel off, deactivate() sets state.active to false. The panel can be drawn to the display with the draw() method.
-    
-    The module includes demo.py that demonstrates some of Interphase functionality.
     """
 
     _image_default = None

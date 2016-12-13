@@ -19,10 +19,7 @@ import interphase
 interphase.init(engine)
 
 
-__docformat__ = 'restructuredtext'
-
-
-module_info = """Interphase Module\n\nThe module adds interface panel functionality to a Pygame application. It was developed as a simple GUI with the goal to simulate a digital display panel. The module provides interface and control objects to design a panel, and numerous methods to manage the panel from the application code."""
+module_info = """Interphase Module\n\nThe module adds interface panel functionality to a Pygame application. It was developed as a simple GUI with the goal to simulate a digital display panel. The module provides interface and control objects to design a panel, with methods to manage the panel from the application code."""
 
 
 class InterfaceDemo(interphase.Interface):
