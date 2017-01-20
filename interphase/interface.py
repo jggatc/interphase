@@ -259,6 +259,16 @@ class Interface(engine.sprite.Sprite):
         self._events = {}
         self._events['controlselect'] = engine.event.Event(EVENT['controlselect'], self._interface)
         self._events['controlinteract'] = engine.event.Event(EVENT['controlinteract'], self._interface)
+        if engine.__name__ == 'pyjsdl':
+            global _touchevt
+            if not _touchevt:
+                _touchevt = _TouchEvt()
+            if _touchevt.active:
+                self._get_mouse_pos = self._get_mouse_pos_alt
+                self._get_mouse_click = self._get_mouse_click_alt
+            else:
+                _touchevt.interfaces.append(self)
+            self.touchactive = False
         self.add_controls()
         self.activate()
 
@@ -975,6 +985,34 @@ class Interface(engine.sprite.Sprite):
             self._control_moveable = setting
             return self._control_moveable
 
+    def _get_mouse_pos(self):
+        pos = engine.mouse.get_pos()
+        col = self.rect.collidepoint(pos)
+        return pos, col
+
+    def _get_mouse_click(self):
+        return engine.mouse.get_pressed()[0]
+
+    def _get_mouse_pos_alt(self):
+        if _touchevt.touchactive:
+            pos = _touchevt.touchx+engine.env.frame.scrollLeft, _touchevt.touchy+engine.env.frame.scrollTop
+            col = self.rect.collidepoint(pos)
+            if col:
+                self.touchactive = True
+                if not _touchevt.touchhold:
+                    _touchevt.touchactive = False
+                    _touchevt.touchx, _touchevt.touchy = -1, -1
+                return pos, col
+            else:
+                return (-1,-1), False
+        else:
+            self._control_press['control'] = None
+            self.touchactive = False
+            return (-1,-1), False
+
+    def _get_mouse_click_alt(self):
+        return self.touchactive
+
     def _display_controls(self):
         """Draws controls on panel.""" 
         if self._panel_active:
@@ -1122,9 +1160,9 @@ class Interface(engine.sprite.Sprite):
 
     def _panel_interaction(self):
         """Check for mouse interaction with panel."""
-        self._pointer_position = engine.mouse.get_pos()
+        self._pointer_position, interact = self._get_mouse_pos()
         if self._displayed:
-            if not self.rect.collidepoint(self._pointer_position):
+            if not interact:
                 self._panel_interact = False
                 self._displayed = False
                 if not self._panel_display:
@@ -1134,7 +1172,7 @@ class Interface(engine.sprite.Sprite):
             else:
                 self._panel_interact = True
         else:
-            if self.rect.collidepoint(self._pointer_position):
+            if interact:
                 self._panel_interact = True
                 self._panel_active = True
                 self._displayed = True
@@ -1181,7 +1219,7 @@ class Interface(engine.sprite.Sprite):
         """Check control selected."""
         if not self._displayed or not self._panel_active or self._panel_disabled:
             return None, None
-        if not engine.mouse.get_pressed()[0]:
+        if not self._get_mouse_click():
             if self._control_press['control']:
                 self._control_press['control'] = None
             if self._scroll_button is None:
@@ -1349,4 +1387,46 @@ class InterfaceState(object):
         self.button = button_select
         self.value = value
         self.values = panel._control_values
+
+
+class _TouchEvt:
+
+    def __init__(self):
+        self.touchobj = None
+        self.touchx = -1
+        self.touchy = -1
+        self.touchactive = False
+        self.touchhold = False
+        self.interfaces = []
+        self.absoluteLeft = None
+        self.absoluteTop = None
+        self.active = False
+        engine.event.touchlistener.add_callback(self)
+
+    def onTouchInitiate(self, event):
+        for interface in self.interfaces:
+            interface._get_mouse_pos = interface._get_mouse_pos_alt
+            interface._get_mouse_click = interface._get_mouse_click_alt
+        self.interfaces[:] = []
+        self.absoluteLeft = engine.env.canvas.getAbsoluteLeft()
+        self.absoluteTop = engine.env.canvas.getAbsoluteTop()
+        self.active = True
+
+    def onTouchStart(self, event):
+        self.touchactive = True
+        self.touchhold = True
+        self.touchobj = event.touches.item(0)
+        self.touchx = self.touchobj.clientX-self.absoluteLeft
+        self.touchy = self.touchobj.clientY-self.absoluteTop
+
+    def onTouchEnd(self, event):
+        self.touchhold = False
+
+    def onTouchMove(self, event):
+        pass
+
+    def onTouchCancel(self, event):
+        pass
+
+_touchevt = None
 
