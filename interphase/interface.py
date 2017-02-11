@@ -153,13 +153,12 @@ class Interface(engine.sprite.Sprite):
         self._moveable = moveable                            #panel moveable
         self._positionx, self._positiony = self._x, self._y     #panel original placement
         self._offsetx, self._offsety = position_offset
-        directionx, directiony = move_rate        #panel move speed
-        if directionx < 1:
-            directionx = directionx * abs(self._offsetx)
-        if directiony < 1:
-            directiony = directiony * abs(self._offsety)
-        self._directionx, self._directiony = int(directionx), int(directiony)
-        self._move_ratex, self._move_ratey = int(self._directionx/40), int(self._directiony/40)
+        self._move_ratex, self._move_ratey = move_rate      #panel move speed
+        if self._move_ratex < 1:
+            self._move_ratex = self._move_ratex * abs(self._offsetx)
+        if self._move_ratey < 1:
+            self._move_ratey = self._move_ratey * abs(self._offsety)
+        self._move_time = 0
         self._move_initiate = False
         self._color = color
         self._initialized = False
@@ -244,11 +243,6 @@ class Interface(engine.sprite.Sprite):
         self._control_move = None   #control selected to move
         self._pointer_position = (0,0)
         self._pointer_interact = pointer_interact   #detect control hover
-        self._clock = engine.time.Clock()
-        for i in range(100):    #issue in _moveable_panel division when get_fps() return 0.0
-            if 30 <= self._clock.get_fps() < 100:
-                break
-            self._clock.tick(30)
         self._update_panel = True   #set for panel update
         self._initial_update = 10   #panel updates for short duration
         self._panel_function = []   #list of panel functions to run on panel update
@@ -736,7 +730,7 @@ class Interface(engine.sprite.Sprite):
         if position_offset:
             self._offsetx, self._offsety = position_offset
         if move_rate:
-            self._directionx, self._directiony = move_rate
+            self._move_ratex, self._move_ratey = move_rate
         if setting == 'Toggle':
             self._moveable = not self._moveable
             return self._moveable
@@ -1101,19 +1095,17 @@ class Interface(engine.sprite.Sprite):
         """Update moveable panel."""
         def move_panel(pos_i, pos_f, z, z_dir, rate_x=0, rate_y=0):
             if not self._move_initiate:
-                fps = self._clock.get_fps()
-                self._move_ratex = int(self._directionx/fps)
-                if not self._move_ratex:
-                    self._move_ratex = 1
-                self._move_ratey = int(self._directiony/fps)
-                if not self._move_ratey:
-                    self._move_ratey = 1
+                self._move_time = engine.time.get_ticks()
                 self._move_initiate = True
+                return pos_i
+            timei = self._move_time
+            self._move_time = engine.time.get_ticks()
+            dt = self._move_time - timei
             if rate_x:
-                rate_x = rate_x*z_dir * z
+                rate_x = int(rate_x*z_dir * z * (dt/1000))
                 rate = rate_x
             else:
-                rate_y = rate_y*z_dir * z
+                rate_y = int(rate_y*z_dir * z * (dt/1000))
                 rate = rate_y
             if abs(pos_i-pos_f) > abs(rate):
                 self.rect.move_ip((rate_x, rate_y))
@@ -1304,7 +1296,6 @@ class Interface(engine.sprite.Sprite):
                 self._update_panel = True
             else:
                 button_select, value = None, None
-        self._clock.tick()
         if force_update:
             self._update_panel = True
         if self._update_panel:

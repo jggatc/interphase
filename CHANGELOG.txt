@@ -7,6 +7,7 @@
 -revise module structure.
 -update for python 2/3 compatibility.
 -add touch event support when using Pyjsdl.
+-update interface move method to utilize timed rate.
 
 0.87    2015-04-12
 -update Text.tprint to use rendered character cache.
