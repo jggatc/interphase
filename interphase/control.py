@@ -101,6 +101,7 @@ class Control(object):
         label_display: bool control label displayed <True>.
         active: bool control active state <True>.
         control_response: int control response (ms). Overrides panel <None>.
+            - 0 no response repeat.
         hold_response: int hold (ms) before control response quicken <1000>.
             - 0 no response change.
         delay_response: int initial delay (ms) before control response <0>.

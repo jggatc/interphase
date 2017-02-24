@@ -123,6 +123,7 @@ class Interface(engine.sprite.Sprite):
         tips_fontcolor: (r,g,b) font color used for tip text <(125,130,135)>.
         tips_position: (x,y) position offset of tip text <(0,-15)>.
         control_response: int control click response (ms) <125>.
+            - 0 for no response repeat.
         pointer_interact: bool pointer interact monitored <False>.
         data_folder: '' image data folder <'data'>.
         data_zip: '' image data zip <None>.
@@ -1253,15 +1254,16 @@ class Interface(engine.sprite.Sprite):
                         return control_select, button_select
         else:
             if self._control_press['control'].active:
-                time = engine.time.get_ticks()
-                if (time-self._control_press['rtime']) > self._control_press['response']:
-                    self._control_press['rtime'] = engine.time.get_ticks()
-                    control_select = self._control_press['control'].id
-                    button_select = self._control_press['button']
-                    if not self._control_press['hold'] or (time-self._control_press['htime']) < self._control_press['hold']:
-                        self._control_press['response'] = self._control_press['control'].control_response
-                    else:
-                        self._control_press['response'] = self._control_press['control'].control_response_hold
+                if self._control_press['response']:
+                    time = engine.time.get_ticks()
+                    if (time-self._control_press['rtime']) > self._control_press['response']:
+                        self._control_press['rtime'] = time
+                        control_select = self._control_press['control'].id
+                        button_select = self._control_press['button']
+                        if not self._control_press['hold'] or (time-self._control_press['htime']) < self._control_press['hold']:
+                            self._control_press['response'] = self._control_press['control'].control_response
+                        else:
+                            self._control_press['response'] = self._control_press['control'].control_response_hold
             else:
                 self._control_press['control'] = None
         return control_select, button_select
