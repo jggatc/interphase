@@ -1397,9 +1397,9 @@ class _TouchEvt:
         engine.event.touchlistener.add_callback(self)
 
     def onTouchInitiate(self, event):
-        for interface in self.interfaces:
-            interface._get_mouse_pos = interface._get_mouse_pos_alt
-            interface._get_mouse_click = interface._get_mouse_click_alt
+        for _interface in self.interfaces:
+            _interface._get_mouse_pos = _interface._get_mouse_pos_alt
+            _interface._get_mouse_click = _interface._get_mouse_click_alt
         self.interfaces[:] = []
         self.absoluteLeft = engine.env.canvas.getAbsoluteLeft()
         self.absoluteTop = engine.env.canvas.getAbsoluteTop()
