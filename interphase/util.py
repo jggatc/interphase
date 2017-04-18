@@ -3,6 +3,10 @@
 
 from __future__ import division
 import os
+try:
+    _set = set
+except NameError:
+    from sets import Set as _set
 from interphase.env import engine
 
 __docformat__ = 'restructuredtext'
@@ -278,7 +282,7 @@ class Text(object):
 
     def split_long_text(self, text, width):
         """Split long text uninterrupted by spaces to fit in surface width."""
-        char_size = self.check_sizes(set(text))
+        char_size = self.check_sizes(_set(text))
         ln = []
         chars = []
         size_sum = 0

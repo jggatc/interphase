@@ -3,6 +3,10 @@
 
 from __future__ import division
 import os
+try:
+    _set = set
+except NameError:
+    from sets import Set as _set
 from interphase.control import Control, FunctionControl, Label, Textbox
 from interphase.util import Text, load_image
 from interphase.env import engine
@@ -185,21 +189,12 @@ class Interface(engine.sprite.Sprite):
         self._control_size = control_size
         self._button_placement = { 'function_select':function_button, 'control_select':control_button, 'textbox':'right' }
         if scroll_button:
-            try:
-                if scroll_button == 'vertical':
-                    self._scroll_button = set([4,5])
-                elif scroll_button == 'horizontal':
-                    self._scroll_button = set([6,7])
-                else:
-                    self._scroll_button = set([4,5,6,7])
-            except NameError:   #set module not available
-                from java.util import HashSet
-                if scroll_button == 'vertical':
-                    self._scroll_button = HashSet([4,5])
-                elif scroll_button == 'horizontal':
-                    self._scroll_button = HashSet([6,7])
-                else:
-                    self._scroll_button = HashSet([4,5,6,7])
+            if scroll_button == 'vertical':
+                self._scroll_button = _set([4,5])
+            elif scroll_button == 'horizontal':
+                self._scroll_button = _set([6,7])
+            else:
+                self._scroll_button = _set([4,5,6,7])
         else:
             self._scroll_button = None
         self._scroll_button_selected = {4:'_top', 5:'_bottom', 6:'_top', 7:'_bottom'}

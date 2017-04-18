@@ -3,6 +3,10 @@
 
 from __future__ import division
 import os
+try:
+    _set = set
+except NameError:
+    from sets import Set as _set
 from interphase.env import engine
 
 __docformat__ = 'restructuredtext'
@@ -766,7 +770,7 @@ class Control(object):
                 size_old = self.size
                 pos_old = self.position[0]+self.size[0]//2, self.position[1]+self.size[1]//2
                 place_old = self.place
-                if not (set(control_list) & set(self.listing)):
+                if not (_set(control_list) & _set(self.listing)):
                     keep_link = False
                     keep_tip = False
                 self.size = size
