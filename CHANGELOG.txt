@@ -9,6 +9,7 @@
 -add touch event support when using Pyjsdl.
 -update interface move method to utilize timed rate.
 -update control response for no repeat option.
+-update module for alternate framework.
 
 0.87    2015-04-12
 -update Text.tprint to use rendered character cache.
