@@ -19,7 +19,7 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
 #
-#Interphase version 0.87
+#Interphase version 0.88
 #Project Site: http://gatc.ca/
 
 try:

@@ -1,4 +1,4 @@
-0.87_dev
+0.88    2019-04-06
 -update interface to address issue in move method when get_fps return zero.
 -add interface.is_panel_display to check panel controls displayed.
 -update interface.set_panel_display to ensure display updates.
