@@ -406,7 +406,7 @@ def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, color
         else:
             image = image.convert()
         if colorkey is not None:
-            if colorkey is -1:
+            if colorkey == -1:
                 colorkey = image.get_at((0,0))
             image.set_colorkey(colorkey, engine.RLEACCEL)
         return image

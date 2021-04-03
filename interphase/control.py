@@ -316,7 +316,7 @@ class Control(object):
 
     def _display(self, image):
         for btn in self.button_list:
-            rect = self.button[btn]()
+            self.button[btn]()
         if self.list_type.startswith('__') or not self.value.startswith('__'):
             self.display.add(self.value)
             image = self.display.render(image)
@@ -338,7 +338,6 @@ class Control(object):
         if not icon_list and not surface:
             icon_list = []
         control_icon = {}
-        icon_size = None
         self.value = ''
         self.place = 0
         if control_list:
@@ -497,7 +496,7 @@ class Control(object):
             for num, item in enumerate(listing_icon):
                 img = surface[num]
                 if color_key:
-                    if color_key is -1:
+                    if color_key == -1:
                         color_key = img.get_at((0,0))
                     img.set_colorkey(color_key, engine.RLEACCEL)
                 control_icon[item] = img
@@ -666,7 +665,7 @@ class Control(object):
         elif surface:
             self.control_image['bg'] = surface.copy()
             if color_key:
-                if color_key is -1:
+                if color_key == -1:
                     color_key = self.control_image['bg'].get_at((0,0))
                 self.control_image['bg'].set_colorkey(color_key, engine.RLEACCEL)
         else:
@@ -1716,7 +1715,7 @@ class Textbox(Control):
 
     def _display(self, image):
         for btn in self.button_list:
-            rect = self.button[btn]()
+            self.button[btn]()
         if self.change:
             for line in self.text[self.line_pos:self.line_pos+self.line_max]:
                 self.display.add(line)

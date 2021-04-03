@@ -530,7 +530,7 @@ class Interface(engine.sprite.Sprite):
         elif surface:
             self._panel_image = surface.copy()
             if color_key:
-                if color_key is -1:
+                if color_key == -1:
                     color_key = self._panel_image.get_at((0,0))
                 self._panel_image.set_colorkey(color_key, engine.RLEACCEL)
             if self._panel_image.get_size() != self._size:
@@ -557,7 +557,7 @@ class Interface(engine.sprite.Sprite):
         elif surface:
             self._control_image['bg'] = surface.copy()
             if color_key:
-                if color_key is -1:
+                if color_key == -1:
                     color_key = self._control_image['bg'].get_at((0,0))
                 self._control_image['bg'].set_colorkey(color_key, engine.RLEACCEL)
         else:
@@ -601,7 +601,7 @@ class Interface(engine.sprite.Sprite):
             for num, frame in enumerate(['t','b']):
                 img = surface[num].copy()
                 if color_key:
-                    if color_key is -1:
+                    if color_key == -1:
                         color_key = img.get_at((0,0))
                     img.set_colorkey(color_key, engine.RLEACCEL)
                 self._button_image[frame] = engine.transform.smoothscale(img, self._button_size)
