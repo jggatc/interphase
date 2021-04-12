@@ -20,7 +20,7 @@
 #THE SOFTWARE.
 #
 #Interphase version 0.88
-#Project Site: http://gatc.ca/
+#Project Site: https://gatc.ca/
 
 try:
     import pygame as engine

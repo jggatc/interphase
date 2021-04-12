@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-#Interphase - Copyright (C) 2009 James Garnon <http://gatc.ca/>
-#Released under the MIT License <http://opensource.org/licenses/MIT>
+#Interphase - Copyright (C) 2009 James Garnon <https://gatc.ca/>
+#Released under the MIT License <https://opensource.org/licenses/MIT>
 #
 #"""
 #Interphase Demo
 #
 #Interphase Module
-#Project Site: http://gatc.ca/
+#Project Site: https://gatc.ca/
 #"""
 
 from __future__ import division
@@ -175,7 +175,7 @@ class InterfaceDemo(interphase.Interface):
             size = 'min_width',
             position = (175,50),
             font_size = 12,
-            control_list = ['Interphase http://gatc.ca'],
+            control_list = ['Interphase https://gatc.ca'],
             tip_list = ['Access Site'],
             label_display = False)
         self.get_control('Next').add_action(self.doc_control)
