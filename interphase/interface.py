@@ -246,9 +246,6 @@ class Interface(engine.sprite.Sprite):
         self._control_event = []    #controls recently pressed
         self._interface = {'state':None, 'update':False}    #interface control state
         self._event = event
-        self._events = {}
-        self._events['controlselect'] = engine.event.Event(EVENT['controlselect'], self._interface)
-        self._events['controlinteract'] = engine.event.Event(EVENT['controlinteract'], self._interface)
         if engine.__name__ == 'pyjsdl':
             global _touchevt
             if not _touchevt:
@@ -1302,10 +1299,14 @@ class Interface(engine.sprite.Sprite):
                 self._interface['state'] = InterfaceState(panel, control_interact, button_interact, control_select, button_select, value)
                 if control_select:
                     if self._controls[control_select].event:
-                        engine.event.post(self._events['controlselect'])
+                        event = engine.event.Event(EVENT['controlselect'],
+                                       {'state':self._interface['state']})
+                        engine.event.post(event)
                 if control_interact:
                     if self._controls[control_interact].event:
-                        engine.event.post(self._events['controlinteract'])
+                        event = engine.event.Event(EVENT['controlinteract'],
+                                      {'state':self._interface['state']})
+                        engine.event.post(event)
             else:
                 self._interface['state'] = InterfaceState(panel)
             self._interface['update'] = True
