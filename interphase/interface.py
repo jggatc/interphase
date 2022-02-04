@@ -1071,16 +1071,16 @@ class Interface(engine.sprite.Sprite):
         return update
 
     def _panel_action(self):
-        for function in self._panel_function:
+        for fn in self._panel_function:
             try:
-                function()
+                fn()
             except TypeError:   #pyjs -O function>unbound method
-                function(self)
+                fn(self)
 
-    def set_panel_function(self, function=None):
+    def set_panel_function(self, fn=None):
         """Add function to panel update list, call without function to delete list."""
-        if function:
-            self._panel_function.append(function)
+        if fn:
+            self._panel_function.append(fn)
         else:
             self._panel_function = []
 

@@ -980,9 +980,9 @@ class Control(object):
         else:
             return None
 
-    def add_action(self, function, obj=None):
+    def add_action(self, fn, obj=None):
         """Bind action function to control. Function should take two arguments, for instance Function(control, value), that will receive the control button pressed and control value. Optional obj argument to provide object for method binding in Pyjs -O mode."""
-        self._function = function
+        self._function = fn
         try:
             if obj and engine.env.pyjs_mode.optimized:
                 self._functionObj = obj
@@ -1501,8 +1501,8 @@ class FunctionControl(Control):
             for ctr in self.link[item]:
                 self.panel._controls[ctr].set_active(False)
         if self.active and self.link_activated:
-            for function in self.link:
-                for link in self.link[function]:
+            for fn in self.link:
+                for link in self.link[fn]:
                     if link in self.link[self.value]:
                         self.panel._controls[link].check_link(self.id, True)
 
@@ -1640,20 +1640,20 @@ class Textbox(Control):
         self.text = text
         return self.text
 
-    def add_format(self, function, obj=None):
-        """Custom format functions. Parameter function is a list of functions that will be applied to text formatting. The functions should receive a text argument, and return the formated text. Passing string 'splitlines', 'nosplitlines', 'wordwrap', 'nowordwrap' will modify standard format procedure. Optional obj argument to provide object for method binding in Pyjs -O mode."""
+    def add_format(self, fn, obj=None):
+        """Custom format functions. Parameter fn is a list of functions that will be applied to text formatting. The functions should receive a text argument, and return the formated text. Passing string 'splitlines', 'nosplitlines', 'wordwrap', 'nowordwrap' will modify standard format procedure. Optional obj argument to provide object for method binding in Pyjs -O mode."""
         func = []
-        for fn in function:
-            if fn == 'splitlines':
+        for _fn in fn:
+            if _fn == 'splitlines':
                 self._format_splitlines = True
-            elif fn == 'wordwrap':
+            elif _fn == 'wordwrap':
                 self._format_wordwrap = True
-            elif fn == 'nosplitlines':
+            elif _fn == 'nosplitlines':
                 self._format_splitlines = False
-            elif fn == 'nowordwrap':
+            elif _fn == 'nowordwrap':
                 self._format_wordwrap = False
             else:
-                func.append(fn)
+                func.append(_fn)
         self._format_function = func
         try:
             if obj and engine.env.pyjs_mode.optimized:
