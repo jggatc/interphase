@@ -17,7 +17,7 @@ __docformat__ = 'restructuredtext'
 """
 :undocumented:EVENT
 """
-EVENT = {'controlselect':30, 'controlinteract':31}
+EVENT = {'controlselect': 30, 'controlinteract': 31}
 
 
 class Interface(engine.sprite.Sprite):
@@ -152,11 +152,14 @@ class Interface(engine.sprite.Sprite):
                 pos_x = pos_x * self._width
             if pos_y < 1:
                 pos_y = pos_y * self._height
-            self._x, self._y = int(pos_x), int(pos_y)
+            self._x = int(pos_x)
+            self._y = int(pos_y)
         else:
-            self._x, self._y = self._width//2, self._height//2
+            self._x = self._width // 2
+            self._y = self._height // 2
         self._moveable = moveable                            #panel moveable
-        self._positionx, self._positiony = self._x, self._y     #panel original placement
+        self._positionx = self._x     #panel original placement
+        self._positiony = self._y
         self._offsetx, self._offsety = position_offset
         self._move_ratex, self._move_ratey = move_rate      #panel move speed
         if self._move_ratex < 1:
@@ -178,27 +181,36 @@ class Interface(engine.sprite.Sprite):
         self._set_image(image, control_image, button_image)    #load panel images
         if control_minsize:
             self._control_minsize = {}
-            padding = ( min(control_minsize[0],control_minsize[1]) // 10 ) + 4
+            padding = (min(control_minsize[0],control_minsize[1])//10) + 4
             if padding % 2:
                 padding -= 1
             self._control_minsize['size'] = control_minsize
-            self._control_minsize['min'] = control_minsize[0]-padding, control_minsize[1]-padding
+            self._control_minsize['min'] = (control_minsize[0] - padding,
+                                            control_minsize[1] - padding)
             self._control_minsize['pad'] = padding
         else:
             self._control_minsize = None
         self._control_size = control_size
-        self._button_placement = { 'function_select':function_button, 'control_select':control_button, 'textbox':'right' }
+        self._button_placement = {'function_select': function_button,
+                                  'control_select': control_button,
+                                  'textbox': 'right'}
         if scroll_button:
             if scroll_button == 'vertical':
-                self._scroll_button = _set([4,5])
+                self._scroll_button = _set([4, 5])
             elif scroll_button == 'horizontal':
-                self._scroll_button = _set([6,7])
+                self._scroll_button = _set([6, 7])
             else:
-                self._scroll_button = _set([4,5,6,7])
+                self._scroll_button = _set([4, 5, 6, 7])
         else:
             self._scroll_button = None
-        self._scroll_button_selected = {4:'_top', 5:'_bottom', 6:'_top', 7:'_bottom'}
-        self._scroll_button_selected_alt = {4:'_top', 5:'_bottom', 6:'_bottom', 7:'_top'}
+        self._scroll_button_selected = {4: '_top',
+                                        5: '_bottom',
+                                        6: '_top',
+                                        7: '_bottom'}
+        self._scroll_button_selected_alt = {4: '_top',
+                                            5: '_bottom',
+                                            6: '_bottom',
+                                            7: '_top'}
         self._control_events = 1
         if moveable:
             self._displayed = False
@@ -232,7 +244,12 @@ class Interface(engine.sprite.Sprite):
         self._active_color = (255,0,0)
         self._update_display = True      #update panel display
         self._control_response = control_response   #response speed of control
-        self._control_press = {'control':None, 'button':None, 'response':0, 'hold':0, 'rtime':0, 'htime':0}
+        self._control_press = {'control': None,
+                               'button': None,
+                               'response': 0,
+                               'hold': 0,
+                               'rtime': 0,
+                               'htime': 0}
         self._label_display = label_display  #show control labels
         self._panel_interact = False
         self._control_moveable = False  #control moveable
@@ -244,7 +261,7 @@ class Interface(engine.sprite.Sprite):
         self._panel_function = []   #list of panel functions to run on panel update
         self._sustain_update = False    #panel register sustained update status
         self._control_event = []    #controls recently pressed
-        self._interface = {'state':None, 'update':False}    #interface control state
+        self._interface = {'state': None, 'update': False}  #interface control state
         self._event = event
         if engine.__name__ == 'pyjsdl':
             global _touchevt
@@ -267,13 +284,21 @@ class Interface(engine.sprite.Sprite):
         """Add control to panel."""
         panel = self
         if control_type in ('control_select', 'control_toggle'):
-            interface_control = Control(panel, identity, control_type, position, **parameters)
+            interface_control = Control(panel, identity,
+                                        control_type, position,
+                                        **parameters)
         elif control_type in ('function_select', 'function_toggle'):
-            interface_control = FunctionControl(panel, identity, control_type, position, **parameters)
+            interface_control = FunctionControl(panel, identity,
+                                                control_type, position,
+                                                **parameters)
         elif control_type == 'label':
-            interface_control = Label(panel, identity, control_type, position, **parameters)
+            interface_control = Label(panel, identity,
+                                      control_type, position,
+                                      **parameters)
         elif control_type == 'textbox':
-            interface_control = Textbox(panel, identity, control_type, position, **parameters)
+            interface_control = Textbox(panel, identity,
+                                        control_type, position,
+                                        **parameters)
         self._controls[identity] = interface_control
         return interface_control
 
@@ -286,7 +311,8 @@ class Interface(engine.sprite.Sprite):
             self._activate_controls()
             if not self._initialized:
                 if self._moveable and not self._display_fixed:
-                    self._x, self._y = self._positionx+self._offsetx, self._positiony+self._offsety
+                    self._x = self._positionx + self._offsetx
+                    self._y = self._positiony + self._offsety
                 self._initialized = True
             if self._zipfile:
                 self._zip_file(close=True)
@@ -317,7 +343,8 @@ class Interface(engine.sprite.Sprite):
 
     def add_control(self, identity, control_type, position, **parameters):
         """Add control to panel."""
-        interface_control = self.add(identity, control_type, position, **parameters)
+        interface_control = self.add(identity, control_type, position,
+                                     **parameters)
         return interface_control
 
     def get_control(self, *control):
@@ -338,7 +365,8 @@ class Interface(engine.sprite.Sprite):
                 del self._controls[ctrl]
                 del self._control_values[ctrl]
                 for item in self._controls:
-                    if self._controls[item].control_type in ('function_select', 'function_toggle'):
+                    if self._controls[item].control_type in ('function_select',
+                                                             'function_toggle'):
                         for function in self._controls[item].link:
                             if ctrl in self._controls[item].link[function]:
                                 self._controls[item].link[function].remove(ctrl)
@@ -406,7 +434,8 @@ class Interface(engine.sprite.Sprite):
             self._zipfile = None
         return self._zipfile
 
-    def _data_source(self, data_folder=None, data_zip=None, color_key=None, file_obj=None):
+    def _data_source(self, data_folder=None, data_zip=None,
+                     color_key=None, file_obj=None):
         """Retrieve default data source."""
         if not file_obj:
             if data_folder is None:
@@ -431,7 +460,7 @@ class Interface(engine.sprite.Sprite):
             if mode == 'save':
                 try:
                     for img in img_obj:
-                        filename = '_'+img_obj[img][0]
+                        filename = '_' + img_obj[img][0]
                         if path:
                             filename = os.path.join(path, filename)
                         image_file = file(filename, 'w')
@@ -440,9 +469,12 @@ class Interface(engine.sprite.Sprite):
                         image_file.close()
                 except IOError:
                     pass
-            image['panel_image'] = self.set_panel_image(img_obj['panel'][0], file_obj=img_obj['panel'][1])
-            image['control_image'] = self.set_control_image(img_obj['control'][0], file_obj=img_obj['control'][1])
-            image['button_image'] = self.set_button_image(img_obj['button'][0], file_obj=img_obj['button'][1])
+            image['panel_image'] = self.set_panel_image(
+                img_obj['panel'][0], file_obj=img_obj['panel'][1])
+            image['control_image'] = self.set_control_image(
+                img_obj['control'][0], file_obj=img_obj['control'][1])
+            image['button_image'] = self.set_button_image(
+                img_obj['button'][0], file_obj=img_obj['button'][1])
         except IOError:
             pass
         return image
@@ -468,12 +500,16 @@ class Interface(engine.sprite.Sprite):
             if button_image == Interface._image_source['button_image']:
                 button_image = None
         default_image = {}
-        if not Interface._image_default and (not image or not control_image or not button_image):
+        if (not Interface._image_default and
+            (not image or not control_image or not button_image)):
             img_obj = self._default_image()
             default_image = {}
-            default_image['panel_image'] = self.set_panel_image(img_obj['panel'][0], file_obj=img_obj['panel'][1])
-            default_image['control_image'] = self.set_control_image(img_obj['control'][0], file_obj=img_obj['control'][1])
-            default_image['button_image'] = self.set_button_image(img_obj['button'][0], file_obj=img_obj['button'][1])
+            default_image['panel_image'] = self.set_panel_image(
+                img_obj['panel'][0], file_obj=img_obj['panel'][1])
+            default_image['control_image'] = self.set_control_image(
+                img_obj['control'][0], file_obj=img_obj['control'][1])
+            default_image['button_image'] = self.set_button_image(
+                img_obj['button'][0], file_obj=img_obj['button'][1])
         if image:
             self._panel_image = self.set_panel_image(image)
         if control_image:
@@ -496,7 +532,8 @@ class Interface(engine.sprite.Sprite):
         if not image:
             self._panel_image = Interface._image_default['panel_image'].copy()
             if self._panel_image.get_size() != self._size:
-                self._panel_image = engine.transform.smoothscale(self._panel_image, self._size)
+                self._panel_image = engine.transform.smoothscale(
+                    self._panel_image, self._size)
             self.image = self._panel_image.copy()
             self.rect = self.image.get_rect(center=(self._x,self._y))
         if not control_image:
@@ -511,16 +548,22 @@ class Interface(engine.sprite.Sprite):
         else:
             return self.image
 
-    def set_panel_image(self, image=None, data_folder=None, data_zip=None, file_obj=None, color_key=None, surface=None):
+    def set_panel_image(self, image=None, data_folder=None,
+                        data_zip=None, file_obj=None, color_key=None,
+                        surface=None):
         """Set image used for panel."""
         if image:
             if isinstance(image, str):
                 image = [image]
             if image[0] != 'none':
-                data_folder, data_zip, color_key = self._data_source(data_folder, data_zip, color_key, file_obj)
-                self._panel_image = self._load_image(image[0], path=data_folder, zipobj=data_zip, fileobj=file_obj, colorkey=color_key)
+                data_folder, data_zip, color_key = self._data_source(
+                    data_folder, data_zip, color_key, file_obj)
+                self._panel_image = self._load_image(
+                    image[0], path=data_folder, zipobj=data_zip,
+                    fileobj=file_obj, colorkey=color_key)
                 if self._panel_image.get_size() != self._size:
-                    self._panel_image = engine.transform.smoothscale(self._panel_image, self._size)
+                    self._panel_image = engine.transform.smoothscale(
+                        self._panel_image, self._size)
             else:
                 self._panel_image = engine.Surface(self._size)
                 self._panel_image.fill(self._color)
@@ -531,7 +574,8 @@ class Interface(engine.sprite.Sprite):
                     color_key = self._panel_image.get_at((0,0))
                 self._panel_image.set_colorkey(color_key, engine.RLEACCEL)
             if self._panel_image.get_size() != self._size:
-                self._panel_image = engine.transform.smoothscale(self._panel_image, self._size) 
+                self._panel_image = engine.transform.smoothscale(
+                    self._panel_image, self._size)
         else:
             self._panel_image = Interface._image_default['panel_image'].copy()
         self.image = self._panel_image.copy()
@@ -540,14 +584,19 @@ class Interface(engine.sprite.Sprite):
             self._display_controls()
         return self._panel_image
 
-    def set_control_image(self, control_image=None, data_folder=None, data_zip=None, file_obj=None, color_key=None, surface=None):
+    def set_control_image(self, control_image=None, data_folder=None,
+                          data_zip=None, file_obj=None, color_key=None,
+                          surface=None):
         """Set image used for control."""
         if control_image:
             if isinstance(control_image, str):
                 control_image = [control_image]
             if control_image[0] != 'none':
-                data_folder, data_zip, color_key = self._data_source(data_folder, data_zip, color_key, file_obj)
-                self._control_image['bg'] = self._load_image(control_image[0], path=data_folder, zipobj=data_zip, fileobj=file_obj, colorkey=color_key)
+                data_folder, data_zip, color_key = self._data_source(
+                    data_folder, data_zip, color_key, file_obj)
+                self._control_image['bg'] = self._load_image(
+                    control_image[0], path=data_folder, zipobj=data_zip,
+                    fileobj=file_obj, colorkey=color_key)
             else:
                 if 'bg' in self._control_image:
                     del self._control_image['bg']
@@ -556,10 +605,12 @@ class Interface(engine.sprite.Sprite):
             if color_key:
                 if color_key == -1:
                     color_key = self._control_image['bg'].get_at((0,0))
-                self._control_image['bg'].set_colorkey(color_key, engine.RLEACCEL)
+                self._control_image['bg'].set_colorkey(color_key,
+                                                       engine.RLEACCEL)
         else:
             try:
-                self._control_image['bg'] = Interface._image_default['control_image']['bg'].copy()
+                self._control_image['bg'] = (
+                    Interface._image_default['control_image']['bg'].copy())
             except:
                 if 'bg' in self._control_image:
                     del self._control_image['bg']
@@ -571,42 +622,63 @@ class Interface(engine.sprite.Sprite):
             self._controls[ctrl]._set_buttonlist()
         if self._initialized:
             for ctrl in self._controls:
-                self._controls[ctrl]._define_buttons(self._controls[ctrl].control_type, self._controls[ctrl].size, self._controls[ctrl].color['normal'], self._controls[ctrl].color['fill'], initialize=False)
+                ctl = self._controls[ctrl]
+                ctl._define_buttons(
+                    ctl.control_type, ctl.size,
+                    ctl.color['normal'], ctl.color['fill'],
+                    initialize=False)
             self._display_controls()
         return self._control_image
 
-    def set_button_image(self, button_image=None, data_folder=None, data_zip=None, file_obj=None, color_key=None, surface=None):
+    def set_button_image(self, button_image=None, data_folder=None,
+                         data_zip=None, file_obj=None, color_key=None,
+                         surface=None):
         """Set image used for buttons."""
         if button_image:
             if isinstance(button_image, str):
                 button_image = [button_image]
             if button_image[0] != 'none':
-                data_folder, data_zip, color_key = self._data_source(data_folder, data_zip, color_key, file_obj)
+                data_folder, data_zip, color_key = self._data_source(
+                    data_folder, data_zip, color_key, file_obj)
                 self._button_image = {}
                 button_frames = 2
                 if len(button_image) == 1:
-                    images = self._load_image(button_image[0], button_frames, path=data_folder, zipobj=data_zip, fileobj=file_obj, colorkey=color_key)
-                    self._button_image['t'] = engine.transform.smoothscale(images[0], self._button_size)
-                    self._button_image['b'] = engine.transform.smoothscale(images[1], self._button_size)
+                    images = self._load_image(
+                        button_image[0], button_frames,
+                        path=data_folder, zipobj=data_zip,
+                        fileobj=file_obj, colorkey=color_key)
+                    self._button_image['t'] = engine.transform.smoothscale(
+                        images[0], self._button_size)
+                    self._button_image['b'] = engine.transform.smoothscale(
+                        images[1], self._button_size)
                 else:
-                    for num, frame in enumerate(['t','b']):
-                        img = self._load_image(button_image[num], path=data_folder, zipobj=data_zip, fileobj=file_obj, colorkey=color_key)
-                        self._button_image[frame] = engine.transform.smoothscale(img, self._button_size)
+                    for num, frame in enumerate(['t', 'b']):
+                        img = self._load_image(
+                            button_image[num], path=data_folder,
+                            zipobj=data_zip, fileobj=file_obj,
+                            colorkey=color_key)
+                        self._button_image[frame] = engine.transform.smoothscale(
+                            img, self._button_size)
             else:
                 self._button_image = {}
         elif surface:
-            for num, frame in enumerate(['t','b']):
+            for num, frame in enumerate(['t', 'b']):
                 img = surface[num].copy()
                 if color_key:
                     if color_key == -1:
                         color_key = img.get_at((0,0))
                     img.set_colorkey(color_key, engine.RLEACCEL)
-                self._button_image[frame] = engine.transform.smoothscale(img, self._button_size)
+                self._button_image[frame] = engine.transform.smoothscale(
+                    img, self._button_size)
         else:
             self._button_image = Interface._image_default['button_image'].copy()
         if self._initialized:
             for ctrl in self._controls:
-                self._controls[ctrl]._define_buttons(self._controls[ctrl].control_type, self._controls[ctrl].size, self._controls[ctrl].color['normal'], self._controls[ctrl].color['fill'], initialize=False)
+                ctl = self._controls[ctrl]
+                ctl._define_buttons(
+                    ctl.control_type, ctl.size,
+                    ctl.color['normal'], ctl.color['fill'],
+                    initialize=False)
             self._display_controls()
         return self._button_image
 
@@ -635,13 +707,16 @@ class Interface(engine.sprite.Sprite):
                     Interface._clipboard_type = 'tk'
                 except ImportError:
                     try:
-                        global StringSelection, DataFlavor, UnsupportedFlavorException, IOException, IllegalStateException
+                        global StringSelection, DataFlavor, \
+                               UnsupportedFlavorException, IOException, \
+                               IllegalStateException
                         from java.awt.datatransfer import StringSelection, DataFlavor
                         from java.awt.datatransfer import UnsupportedFlavorException
                         from java.io import IOException
                         from java.lang import IllegalStateException
                         from java.awt import Toolkit
-                        Interface._clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+                        tk = Toolkit.getDefaultToolkit()
+                        Interface._clipboard = tk.getSystemClipboard()
                         Interface._clipboard_type = 'jtk'
                     except ImportError:
                         try:
@@ -718,7 +793,8 @@ class Interface(engine.sprite.Sprite):
         elif setting == 'Fixed':
             return self._display_fixed
 
-    def set_moveable(self, setting='Toggle', position_offset=None, move_rate=None):
+    def set_moveable(self, setting='Toggle',
+                     position_offset=None, move_rate=None):
         """Set panel moveable setting."""
         if position_offset:
             self._offsetx, self._offsety = position_offset
@@ -738,15 +814,15 @@ class Interface(engine.sprite.Sprite):
 
     def move(self, x, y):
         """Move panel to new position x,y."""
-        self._x, self._y = x, y
-        self._panel_rect.x = self._x-(self._size[0]//2)
-        self._panel_rect.y = self._y-(self._size[1]//2)
+        self._x = x
+        self._y = y
+        self._panel_rect.x = self._x - (self._size[0]//2)
+        self._panel_rect.y = self._y - (self._size[1]//2)
         for ctrl in self._controls:
-            control_type = self._controls[ctrl].control_type
-            size = self._controls[ctrl].size
-            color = self._controls[ctrl].color['normal']
-            fill = self._controls[ctrl].color['fill']
-            self._controls[ctrl].button, self._controls[ctrl].rects = self._controls[ctrl]._define_buttons(control_type, size, color, fill)
+            ctl = self._controls[ctrl]
+            ctl.button, ctl.rects = ctl._define_buttons(
+                ctl.control_type, ctl.size,
+                ctl.color['normal'], ctl.color['fill'])
         self._update_panel = True
 
     def is_panel_display(self):
@@ -904,14 +980,17 @@ class Interface(engine.sprite.Sprite):
         size = self.get_size()
         if not position:
             if not offset:
-                mouse_x, mouse_y = self._pointer_position
-                pos = mouse_x - x + (size[0]//2), mouse_y - y + (size[1]//2)
-                pos = [pos[0]-(control.size[0]//2), pos[1]-(control.size[1]//2)]
+                pos = (self._pointer_position[0]-x + (size[0]//2),
+                       self._pointer_position[1]-y + (size[1]//2))
+                pos = ([pos[0] - (control.size[0]//2),
+                        pos[1] - (control.size[1]//2)])
             else:
-                pos = [control.position[0]+offset[0], control.position[1]+offset[1]]
+                pos = [control.position[0] + offset[0],
+                       control.position[1] + offset[1]]
         else:
             pos = position[0], position[1]
-            pos = [pos[0]-(control.size[0]//2), pos[1]-(control.size[1]//2)]
+            pos = [pos[0] - (control.size[0]//2),
+                   pos[1] - (control.size[1]//2)]
         ladj = 0
         radj = 0
         if control.control_type in self._button_placement:
@@ -919,30 +998,34 @@ class Interface(engine.sprite.Sprite):
                 ladj = 16
             elif self._button_placement[control.control_type] == 'right':
                 radj = 16
-        if pos[0] - ladj < 0:
+        if pos[0]-ladj < 0:
             pos[0] = ladj
         elif pos[0]+control.size[0]+radj > size[0]:
-            pos[0] = size[0]-(control.size[0]+radj)
+            pos[0] = size[0] - (control.size[0]+radj)
         if pos[1] < 0:
             pos[1] = 0
         elif pos[1]+control.size[1] > size[1]:
-            pos[1] = size[1]-control.size[1]
+            pos[1] = size[1] - control.size[1]
         pos = (pos[0], pos[1])
-        dx, dy = pos[0]-control.position[0], pos[1]-control.position[1]
+        dx = pos[0] - control.position[0]
+        dy = pos[1] - control.position[1]
         control.position = pos
         control_type = control.control_type
         size = control.size
         color = control.color['normal']
         fill = control.color['fill']
-        control._define_buttons(control_type, size, color, fill, initialize=False)
+        control._define_buttons(
+            control_type, size, color, fill, initialize=False)
         for rect in control.rects:
-            control.rects[rect].move_ip(dx,dy)
+            control.rects[rect].move_ip(dx, dy)
         width, height = control.display.check_size('x')
-        pos = ( control.position[0]+(size[0]//2), control.position[1]+(size[1]//2)-(height//2) )
-        control.display.set_position((pos),center=True)
+        pos = (control.position[0] + (size[0]//2),
+               control.position[1] + (size[1]//2) - (height//2))
+        control.display.set_position((pos), center=True)
         control.text_image = {}
-        pos = ( control.position[0]+(size[0]//2), control.position[1]-(control.font_size+3) )
-        control.label.set_position((pos),center=True)
+        pos = (control.position[0] + (size[0]//2),
+               control.position[1] - (control.font_size+3))
+        control.label.set_position((pos), center=True)
         self._update_panel = True
 
     def set_control_move(self, control=None, mouse_visible=True):
@@ -982,13 +1065,15 @@ class Interface(engine.sprite.Sprite):
 
     def _get_mouse_pos_alt(self):
         if _touchevt.touchactive:
-            pos = _touchevt.touchx+engine.env.frame.scrollLeft, _touchevt.touchy+engine.env.frame.scrollTop
+            pos = (_touchevt.touchx+engine.env.frame.scrollLeft,
+                   _touchevt.touchy+engine.env.frame.scrollTop)
             col = self.rect.collidepoint(pos)
             if col:
                 self.touchactive = True
                 if not _touchevt.touchhold:
                     _touchevt.touchactive = False
-                    _touchevt.touchx, _touchevt.touchy = -1, -1
+                    _touchevt.touchx = -1
+                    _touchevt.touchy = -1
                 return pos, col
             else:
                 return (-1,-1), False
@@ -1001,7 +1086,7 @@ class Interface(engine.sprite.Sprite):
         return self.touchactive
 
     def _display_controls(self):
-        """Draws controls on panel.""" 
+        """Draws controls on panel."""
         if self._panel_active:
             if not hasattr(self.image, 'clear'):
                 self.image = self._panel_image.copy()
@@ -1009,37 +1094,44 @@ class Interface(engine.sprite.Sprite):
                 self.image.clear()
                 self.image.blit(self._panel_image, (0,0))
             for ctrl in self._controls:
-                if self._controls[ctrl].active:
-                    self.image = self._controls[ctrl]._display(self.image)
-                    if self._label_display and self._controls[ctrl].label_display:
-                        if not self._controls[ctrl].label_text.startswith('__'):
-                            self._controls[ctrl].label.add(self._controls[ctrl].label_text)
-                            self.image = self._controls[ctrl].label.render(self.image)
+                ctl = self._controls[ctrl]
+                if ctl.active:
+                    self.image = ctl._display(self.image)
+                    if self._label_display and ctl.label_display:
+                        if not ctl.label_text.startswith('__'):
+                            ctl.label.add(ctl.label_text)
+                            self.image = ctl.label.render(self.image)
             if self._tips_display:
                 if self._panel_interact:
-                    mouse_x, mouse_y = self._pointer_position
+                    x, y = self._pointer_position
                     if self._control_hover:
-                        if not self._controls[self._control_hover].active or not self._controls[self._control_hover].rects[self._control_hover].collidepoint(mouse_x,mouse_y):
+                        ctl = self._controls[self._control_hover]
+                        if (not ctl.active or
+                            not ctl.rects[self._control_hover].collidepoint(x,y)):
                             self._control_hover = None
                     if not self._control_hover:
                         for ctrl in self._controls:
-                            if self._controls[ctrl].active:
-                                if self._controls[ctrl].tips:
+                            ctl = self._controls[ctrl]
+                            if ctl.active:
+                                if ctl.tips:
                                     try:
-                                        if self._controls[ctrl].rects[ctrl].collidepoint(mouse_x,mouse_y):
+                                        if ctl.rects[ctrl].collidepoint(x,y):
                                             self._control_hover = ctrl
                                             break
                                     except:
-                                        if not ctrl in self._controls_disabled:
-                                            self._controls[ctrl].tips = None
+                                        if ctrl not in self._controls_disabled:
+                                            ctl.tips = None
                     try:
                         if self._control_hover:
-                            if len(self._controls[self._control_hover].tips) == 1:
-                                tip = self._controls[self._control_hover].tips[self._controls[self._control_hover].tips.keys()[0]]
+                            ctl = self._controls[self._control_hover]
+                            if len(ctl.tips) == 1:
+                                tip = ctl.tips[ctl.tips.keys()[0]]
                             else:
-                                tip = self._controls[self._control_hover].tips[self._controls[self._control_hover].value]
-                            pos = mouse_x-(self._x-(self._size[0]//2)), mouse_y-(self._y-(self._size[1]//2))
-                            pos = pos[0]+self._tips_position[0], pos[1]+self._tips_position[1]
+                                tip = ctl.tips[ctl.value]
+                            pos = (x - (self._x-(self._size[0]//2)),
+                                   y - (self._y-(self._size[1]//2)))
+                            pos = (pos[0] + self._tips_position[0],
+                                   pos[1] + self._tips_position[1])
                             self._tips.set_position(pos, center=True)
                             self._tips.add(tip)
                             self.image = self._tips.render(self.image)
@@ -1095,10 +1187,10 @@ class Interface(engine.sprite.Sprite):
             self._move_time = engine.time.get_ticks()
             dt = self._move_time - timei
             if rate_x:
-                rate_x = int(rate_x*z_dir * z * (dt/1000))
+                rate_x = int(rate_x * z_dir * z * (dt/1000))
                 rate = rate_x
             else:
-                rate_y = int(rate_y*z_dir * z * (dt/1000))
+                rate_y = int(rate_y * z_dir * z * (dt/1000))
                 rate = rate_y
             if abs(pos_i-pos_f) > abs(rate):
                 self.rect.move_ip((rate_x, rate_y))
@@ -1107,9 +1199,9 @@ class Interface(engine.sprite.Sprite):
             else:
                 adj = abs(pos_i-pos_f)
                 if rate_x:
-                    rate_x = adj*z_dir * z
+                    rate_x = adj * z_dir * z
                 else:
-                    rate_y = adj*z_dir * z
+                    rate_y = adj * z_dir * z
                 self.rect.move_ip((rate_x, rate_y))
                 pos_i = pos_f
                 self._panel_disabled = False
@@ -1118,28 +1210,32 @@ class Interface(engine.sprite.Sprite):
         if self._displayed or self._display_fixed:
             if self._offsetx:
                 if self._x != self._positionx:
-                    z = self._offsetx//abs(self._offsetx)
+                    z = self._offsetx // abs(self._offsetx)
                     z_dir = -1
-                    self._x = move_panel(self._x, self._positionx, z, z_dir, rate_x=self._move_ratex)
+                    self._x = move_panel(self._x, self._positionx,
+                                         z, z_dir, rate_x=self._move_ratex)
                     self._update_panel = True
             if self._offsety:
                 if self._y != self._positiony:
-                    z = self._offsety//abs(self._offsety)
+                    z = self._offsety // abs(self._offsety)
                     z_dir = -1
-                    self._y = move_panel(self._y, self._positiony, z, z_dir, rate_y=self._move_ratey)
+                    self._y = move_panel(self._y, self._positiony,
+                                         z, z_dir, rate_y=self._move_ratey)
                     self._update_panel = True
         else:
             if self._offsetx:
                 if self._x != self._positionx+self._offsetx:
-                    z = self._offsetx//abs(self._offsetx)
+                    z = self._offsetx // abs(self._offsetx)
                     z_dir = 1
-                    self._x = move_panel(self._x, self._positionx+self._offsetx, z, z_dir, rate_x=self._move_ratex)
+                    self._x = move_panel(self._x, self._positionx+self._offsetx,
+                                         z, z_dir, rate_x=self._move_ratex)
                     self._update_panel = True
             if self._offsety:
-                if self._y != self._positiony+self._offsety:
-                    z = self._offsety//abs(self._offsety)
+                if self._y != self._positiony + self._offsety:
+                    z = self._offsety // abs(self._offsety)
                     z_dir = 1
-                    self._y = move_panel(self._y, self._positiony+self._offsety, z, z_dir, rate_y=self._move_ratey)
+                    self._y = move_panel(self._y, self._positiony+self._offsety,
+                                         z, z_dir, rate_y=self._move_ratey)
                     self._update_panel = True
         return self._panel_disabled
 
@@ -1167,42 +1263,55 @@ class Interface(engine.sprite.Sprite):
 
     def _control_interact(self, pos):
         """Check control interaction."""
-        if not self._displayed or not self._panel_active or self._panel_disabled:
+        if (not self._displayed or
+            not self._panel_active or
+            self._panel_disabled):
             return None, None
         control_interact = None
         button_interact = None
         if self._tips_display:
             self._update_panel = True
             if self._control_hover:    #control interaction in tips display
-                control_interact, button_interact = self._control_hover, self._control_hover
+                control_interact = self._control_hover
+                button_interact = self._control_hover
         else:
             if self._pointer_interact:     #detect pointer move interact
                 self._update_panel = True
                 for ctrl in self._controls:
-                    if self._controls[ctrl].active:
-                        for rect in self._controls[ctrl].rects:
-                            if self._controls[ctrl].rects[rect].collidepoint(pos):
-                                control_interact, button_interact = ctrl, rect
+                    ctl = self._controls[ctrl]
+                    if ctl.active:
+                        for rect in ctl.rects:
+                            if ctl.rects[rect].collidepoint(pos):
+                                control_interact = ctrl
+                                button_interact = rect
                                 break
         return control_interact, button_interact
 
     def _control_scroll(self, pos, btn):
         for control in self._controls:
-            if not self._controls[control].active or self._controls[control].control_type not in ['function_select', 'control_select', 'textbox']:
+            ctl = self._controls[control]
+            if (not ctl.active or
+                ctl.control_type not in ['function_select',
+                                         'control_select',
+                                         'textbox']):
                 continue
-            for button in self._controls[control].rects:
+            for button in ctl.rects:
                 if button.endswith('_bg'):
                     continue
-                if self._controls[control].rects[button].collidepoint(pos):
-                    if not self._controls[control].listing[0][:-2] == '__numeric':  #TODO: encapsulate in control
-                        return control, control+self._scroll_button_selected[btn]
+                if ctl.rects[button].collidepoint(pos):
+                    if ctl.listing[0][:-2] != '__numeric':  #encapsulate in control
+                        return (control,
+                                control + self._scroll_button_selected[btn])
                     else:
-                        return control, control+self._scroll_button_selected_alt[btn]
+                        return (control,
+                                control + self._scroll_button_selected_alt[btn])
         return None, None
 
     def _control_select(self, pos):
         """Check control selected."""
-        if not self._displayed or not self._panel_active or self._panel_disabled:
+        if (not self._displayed or
+            not self._panel_active or
+            self._panel_disabled):
             return None, None
         if not self._get_mouse_click():
             if self._control_press['control']:
@@ -1226,45 +1335,52 @@ class Interface(engine.sprite.Sprite):
         button_select = None
         if not self._control_press['control']:
             for control in self._controls:
-                if not self._controls[control].active:
+                ctl = self._controls[control]
+                if not ctl.active:
                     continue
-                for button in self._controls[control].rects:
+                for button in ctl.rects:
                     if button.endswith('_bg'):
                         continue
-                    if self._controls[control].rects[button].collidepoint(pos):
-                        self._control_press['control'] = self._controls[control]
-                        self._control_press['button'] = button
-                        self._control_press['hold'] = self._control_press['control'].hold_response
-                        if self._control_press['control'].delay_response:
-                            self._control_press['response'] = self._control_press['control'].delay_response
-                            if self._control_press['hold']:
-                                self._control_press['hold'] += self._control_press['control'].delay_response
+                    if ctl.rects[button].collidepoint(pos):
+                        ctl_press = self._control_press
+                        ctl_press['control'] = ctl
+                        ctl_press['button'] = button
+                        ctl_press['hold'] = ctl.hold_response
+                        if ctl.delay_response:
+                            ctl_press['response'] = ctl.delay_response
+                            if ctl_press['hold']:
+                                ctl_press['hold'] += ctl.delay_response
                         else:
-                            self._control_press['response'] = self._control_press['control'].control_response
-                            control_select, button_select = control, button
-                        self._control_press['rtime'] = self._control_press['htime'] = engine.time.get_ticks()
+                            ctl_press['response'] = ctl.control_response
+                            control_select = control
+                            button_select = button
+                        ctl_press['rtime'] = engine.time.get_ticks()
+                        ctl_press['htime'] = ctl_press['rtime']
                         return control_select, button_select
         else:
-            if self._control_press['control'].active:
-                if self._control_press['response']:
+            ctl_press = self._control_press
+            ctl = self._control_press['control']
+            if ctl.active:
+                if ctl_press['response']:
                     time = engine.time.get_ticks()
-                    if (time-self._control_press['rtime']) > self._control_press['response']:
-                        self._control_press['rtime'] = time
-                        control_select = self._control_press['control'].id
-                        button_select = self._control_press['button']
-                        if not self._control_press['hold'] or (time-self._control_press['htime']) < self._control_press['hold']:
-                            self._control_press['response'] = self._control_press['control'].control_response
+                    if (time-ctl_press['rtime']) > ctl_press['response']:
+                        ctl_press['rtime'] = time
+                        control_select = ctl.id
+                        button_select = ctl_press['button']
+                        if (not ctl_press['hold'] or
+                            (time-ctl_press['htime']) < ctl_press['hold']):
+                            ctl_press['response'] = ctl.control_response
                         else:
-                            self._control_press['response'] = self._control_press['control'].control_response_hold
+                            ctl_press['response'] = ctl.control_response_hold
             else:
-                self._control_press['control'] = None
+                ctl_press['control'] = None
         return control_select, button_select
 
     def _interact(self):
         """Check for mouse interaction with controls."""
-        control_interact, button_interact = self._control_interact(self._pointer_position)
-        control_select, button_select = self._control_select(self._pointer_position)
-        return control_interact, button_interact, control_select, button_select
+        ctl_interact, btn_interact = self._control_interact(self._pointer_position)
+        ctl_select, btn_select = self._control_select(self._pointer_position)
+        return (ctl_interact, btn_interact, ctl_select, btn_select)
 
     def _control_action(self, control, button):
         """Does control action, returns button pressed and current control value."""
@@ -1284,28 +1400,31 @@ class Interface(engine.sprite.Sprite):
         """Update control panel, determines interaction, does control action."""
         update = self._display_update()
         if update:
-            control_interact, button_interact, control_select, button_select = self._interact()
-            if control_select:
-                button_select, value = self._control_action(control_select, button_select)
+            ctl_interact, btn_interact, ctl_select, btn_select = self._interact()
+            if ctl_select:
+                btn_select, value = self._control_action(ctl_select, btn_select)
                 self._update_panel = True
             else:
-                button_select, value = None, None
+                btn_select = None
+                value = None
         if force_update:
             self._update_panel = True
         if self._update_panel:
             self._display_controls()
             panel = self
             if update:
-                self._interface['state'] = InterfaceState(panel, control_interact, button_interact, control_select, button_select, value)
-                if control_select:
-                    if self._controls[control_select].event:
+                self._interface['state'] = InterfaceState(
+                    panel, ctl_interact, btn_interact,
+                    ctl_select, btn_select, value)
+                if ctl_select:
+                    if self._controls[ctl_select].event:
                         event = engine.event.Event(EVENT['controlselect'],
-                                       {'state':self._interface['state']})
+                            {'state': self._interface['state']})
                         engine.event.post(event)
-                if control_interact:
-                    if self._controls[control_interact].event:
+                if ctl_interact:
+                    if self._controls[ctl_interact].event:
                         event = engine.event.Event(EVENT['controlinteract'],
-                                      {'state':self._interface['state']})
+                            {'state': self._interface['state']})
                         engine.event.post(event)
             else:
                 self._interface['state'] = InterfaceState(panel)
@@ -1405,8 +1524,8 @@ class _TouchEvt:
         self.touchactive = True
         self.touchhold = True
         self.touchobj = event.touches.item(0)
-        self.touchx = self.touchobj.clientX-self.absoluteLeft
-        self.touchy = self.touchobj.clientY-self.absoluteTop
+        self.touchx = self.touchobj.clientX - self.absoluteLeft
+        self.touchy = self.touchobj.clientY - self.absoluteTop
 
     def onTouchEnd(self, event):
         self.touchhold = False

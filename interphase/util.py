@@ -24,7 +24,7 @@ class Text(object):
     def __init__(self, surface, font_type=None, font_size=None):
         self.screen = surface
         x, y = self.screen.get_size()
-        self.dimension = {'x':x, 'y':y}
+        self.dimension = {'x': x, 'y': y}
         self.message = None
         self.messages = []
         if font_size:
@@ -53,7 +53,8 @@ class Text(object):
                     font_type = font
             Text._font['default'] = font
             Text._font['defaults'] = font_type
-            Text._font[font] = { self.font_size:engine.font.Font(font,self.font_size) }
+            _font = engine.font.Font(font, self.font_size)
+            Text._font[font] = {self.font_size: _font}
             font_type = None
         if font_type:
             font_type = ','.join(font_type)
@@ -67,7 +68,8 @@ class Text(object):
                     font_type = engine.font.match_font(font_type)
                 if font_type:
                     if font_type not in Text._font:
-                        Text._font[font_type] = { self.font_size:engine.font.Font(font_type,self.font_size) }
+                        _font = engine.font.Font(font_type, self.font_size)
+                        Text._font[font_type] = {self.font_size: _font}
                 else:
                     font_type = Text._font['default']
             else:
@@ -75,7 +77,8 @@ class Text(object):
         else:
             font_type = Text._font['default']
         if self.font_size not in Text._font[font_type]:
-            Text._font[font_type][self.font_size] = engine.font.Font(font_type,self.font_size)
+            _font = engine.font.Font(font_type, self.font_size)
+            Text._font[font_type][self.font_size] = _font
         self.font_type = font_type
         self.font = Text._font[self.font_type]
         self.x = 0
@@ -85,7 +88,7 @@ class Text(object):
         self.font_bgcolor = (0,0,0)
         self.split_text = False
         self.linesize = self.font[self.font_size].get_linesize()
-        self.margin = {'t':0, 'r':0, 'b':0, 'l':0}
+        self.margin = {'t': 0, 'r': 0, 'b': 0, 'l': 0}
         self.multiline = False
         self.cache = None
         self.cache_key = None
@@ -108,7 +111,7 @@ class Text(object):
         self.update()
         return self.surface
 
-    def add(self,*message_append):
+    def add(self, *message_append):
         """Add to text."""
         for item in message_append:
             self.message = str(item)
@@ -135,10 +138,16 @@ class Text(object):
 
     def set_margin(self, margin):
         """Set text margin."""
-        try:
-            self.margin['t'], self.margin['r'], self.margin['b'], self.margin['l'] = margin
-        except TypeError:
-            self.margin['t'] = self.margin['r'] = self.margin['b'] = self.margin['l'] = margin
+        if isinstance(margin, int):
+            self.margin['t'] = margin
+            self.margin['r'] = margin
+            self.margin['b'] = margin
+            self.margin['l'] = margin
+        else:
+            self.margin['t'] = margin[0]
+            self.margin['r'] = margin[1]
+            self.margin['b'] = margin[2]
+            self.margin['l'] = margin[3]
 
     def set_multiline(self, multiline=True):
         """Set multiline text."""
@@ -163,7 +172,8 @@ class Text(object):
                 font = engine.font.match_font(font_type)
             if font:
                 if font not in Text._font:
-                    Text._font[font] = { self.font_size:engine.font.Font(font,self.font_size) }
+                    _font = engine.font.Font(font,self.font_size)
+                    Text._font[font] = {self.font_size: _font}
                 self.font = Text._font[font]
                 self.font_type = font
                 if default:
@@ -189,7 +199,8 @@ class Text(object):
         """Set font size of text."""
         self.font_size = size
         if size not in Text._font[self.font_type]:
-            Text._font[self.font_type][self.font_size] = engine.font.Font(self.font_type,self.font_size)
+            _font = engine.font.Font(self.font_type, self.font_size)
+            Text._font[self.font_type][self.font_size] = _font
         self.font = Text._font[self.font_type]
         self.linesize = self.font[self.font_size].get_linesize()
         self.cache = None
@@ -226,8 +237,9 @@ class Text(object):
             col, row = dim[0], dim[1]
         except IndexError:
             col, row = dim[0]
-        sizes = [self.check_size(char)[0] for char in 'abcdefghijklmnopqrstuvwxyz ']
-        charsize = sum(sizes)//len(sizes)
+        sizes = [self.check_size(char)[0]
+                 for char in 'abcdefghijklmnopqrstuvwxyz ']
+        charsize = sum(sizes) // len(sizes)
         width = (col*charsize) + (self.margin['l']+self.margin['r'])
         height = ((row*self.linesize)-2) + (self.margin['t']+self.margin['b'])
         return width, height
@@ -313,17 +325,24 @@ class Text(object):
 
     def _cache_chr(self, ch):
         if self.font_bgcolor:
-            text_surface = self.font[self.font_size].render(ch, True, self.font_color, self.font_bgcolor)
+            text_surface = self.font[self.font_size].render(
+                ch, True, self.font_color, self.font_bgcolor)
         else:
-            text_surface = self.font[self.font_size].render(ch, True, self.font_color)
+            text_surface = self.font[self.font_size].render(
+                ch, True, self.font_color)
         try:
-            self.cache[ch] = {'image':text_surface, 'width':text_surface.get_width()}
+            self.cache[ch] = {'image': text_surface,
+                              'width': text_surface.get_width()}
         except TypeError:
-            self.cache_key = self.font_type + str(self.font_size) + str(self.font_color) + str(self.font_bgcolor)
+            self.cache_key = (self.font_type
+                              + str(self.font_size)
+                              + str(self.font_color)
+                              + str(self.font_bgcolor))
             if self.cache_key not in self._cache:
                 self._cache[self.cache_key] = {}
             self.cache = self._cache[self.cache_key]
-            self.cache[ch] = {'image':text_surface, 'width':text_surface.get_width()}
+            self.cache[ch] = {'image': text_surface,
+                              'width': text_surface.get_width()}
 
     def _get_width(self, text):
         width = 0
@@ -339,7 +358,10 @@ class Text(object):
         """Print text to surface."""
         if self.messages != []:
             if not self.cache:
-                self.cache_key = self.font_type + str(self.font_size) + str(self.font_color) + str(self.font_bgcolor)
+                self.cache_key = (self.font_type
+                                  + str(self.font_size)
+                                  + str(self.font_color)
+                                  + str(self.font_bgcolor))
                 if self.cache_key not in self._cache:
                     self._cache[self.cache_key] = {}
                 self.cache = self._cache[self.cache_key]
@@ -395,7 +417,8 @@ class Text(object):
         self.tprint()
 
 
-def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, colorkey=None, errorhandle=True):
+def load_image(filename, frames=1, path='data', zipobj=None,
+               fileobj=None, colorkey=None, errorhandle=True):
     """
     Load image from file.
     Arguments include the image filename, the number of image frames in an image strip, the image path, zipobj for image in a zip file, fileobj for image in a file-like object, image colorkey, and errorhandle for exception handling.
@@ -449,7 +472,8 @@ def load_image(filename, frames=1, path='data', zipobj=None, fileobj=None, color
             width = width // frames
             for frame in range(frames):
                 frame_num = width * frame
-                image_frame = image.subsurface((frame_num,0,width,height)).copy()
+                image_frame = image.subsurface(
+                    (frame_num, 0, width, height)).copy()
                 image_frame.set_alpha(image.get_alpha())
                 image_frame = convert_image(image_frame, colorkey)
                 images.append(image_frame)
