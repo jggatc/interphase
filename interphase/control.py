@@ -119,18 +119,11 @@ class Control(object):
         """
         self.id = identity      #control identity
         self.panel = panel      #panel holding control
-        if control_type in ['function_select',
-                            'function_toggle',
-                            'control_select',
-                            'control_toggle',
-                            'label',
-                            'textbox']:
+        if control_type in self.panel._control['types']:
             self.control_type = control_type    #functional type of control
         else:
             raise ValueError('Incorrect control type.')
-        if self.control_type in ['function_select',
-                                 'control_select',
-                                 'textbox']:
+        if self.control_type in self.panel._control['scrollable']:
             self.switches = control_button
         else:
             self.switches = False
@@ -1647,8 +1640,10 @@ class Control(object):
             if self.listing[0][:-2] == '__numeric':
                 if button == self.id:
                     button = self.button_forward
-                {'i':self._action_numeric_i,
-                 'f':self._action_numeric_f}[self.listing[0][-1]](button)
+                if self.listing[0][-1] == 'i':
+                    self._action_numeric_i(button)
+                else:
+                    self._action_numeric_f(button)
             else:
                 if button == self.id:
                     self.activated = not self.activated

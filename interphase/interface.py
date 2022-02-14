@@ -29,6 +29,7 @@ class Interface(engine.sprite.Sprite):
     Interface interaction can be maintained with the InterfaceState object, that is returned by update() or get_state(), or through Pygame event queue checking for event.type interphase.EVENT[ 'controlselect' ] and interphase.EVENT[ 'controlinteract' ] with the attribute event.state that references the InterfaceState object. To turn the panel off, deactivate() sets state.active to false. The panel can be drawn to the display with the draw() method.
     """
 
+    _control = None
     _image_default = None
     _image_source = None
     _clipboard = None
@@ -273,6 +274,8 @@ class Interface(engine.sprite.Sprite):
             else:
                 _touchevt.interfaces.append(self)
             self.touchactive = False
+        if Interface._control is None:
+            self._initiate()
         self.add_controls()
         self.activate()
 
@@ -282,25 +285,11 @@ class Interface(engine.sprite.Sprite):
 
     def add(self, identity, control_type, position, **parameters):
         """Add control to panel."""
-        panel = self
-        if control_type in ('control_select', 'control_toggle'):
-            interface_control = Control(panel, identity,
-                                        control_type, position,
-                                        **parameters)
-        elif control_type in ('function_select', 'function_toggle'):
-            interface_control = FunctionControl(panel, identity,
-                                                control_type, position,
-                                                **parameters)
-        elif control_type == 'label':
-            interface_control = Label(panel, identity,
-                                      control_type, position,
-                                      **parameters)
-        elif control_type == 'textbox':
-            interface_control = Textbox(panel, identity,
-                                        control_type, position,
-                                        **parameters)
-        self._controls[identity] = interface_control
-        return interface_control
+        control_obj = self._control[control_type]
+        control = control_obj(self, identity, control_type, position,
+                              **parameters)
+        self._controls[identity] = control
+        return control
 
     def activate(self, activate_panel=True):
         """Panel activation."""
@@ -327,6 +316,21 @@ class Interface(engine.sprite.Sprite):
         self._control_press['control'] = None
         self._panel_disabled = True
         self.panel_update()
+
+    def _initiate(self):
+        Interface._control = {
+            'types': _set(['control_select', 'control_toggle',
+                           'function_select', 'function_toggle',
+                           'label', 'textbox']),
+            'linkable': _set(['function_select', 'function_toggle']),
+            'scrollable': _set(['control_select', 'function_select',
+                                'textbox']),
+            'control_select': Control,
+            'control_toggle': Control,
+            'function_select': FunctionControl,
+            'function_toggle': FunctionControl,
+            'label': Label,
+            'textbox': Textbox}
 
     def _force_update(self):
         if self._initial_update:
@@ -365,8 +369,8 @@ class Interface(engine.sprite.Sprite):
                 del self._controls[ctrl]
                 del self._control_values[ctrl]
                 for item in self._controls:
-                    if self._controls[item].control_type in ('function_select',
-                                                             'function_toggle'):
+                    if (self._controls[item].control_type in
+                        self._control['linkable']):
                         for function in self._controls[item].link:
                             if ctrl in self._controls[item].link[function]:
                                 self._controls[item].link[function].remove(ctrl)
@@ -1291,9 +1295,7 @@ class Interface(engine.sprite.Sprite):
         for control in self._controls:
             ctl = self._controls[control]
             if (not ctl.active or
-                ctl.control_type not in ['function_select',
-                                         'control_select',
-                                         'textbox']):
+                ctl.control_type not in self._control['scrollable']):
                 continue
             for button in ctl.rects:
                 if button.endswith('_bg'):
