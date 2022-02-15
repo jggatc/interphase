@@ -29,7 +29,19 @@ class Interface(engine.sprite.Sprite):
     Interface interaction can be maintained with the InterfaceState object, that is returned by update() or get_state(), or through Pygame event queue checking for event.type interphase.EVENT[ 'controlselect' ] and interphase.EVENT[ 'controlinteract' ] with the attribute event.state that references the InterfaceState object. To turn the panel off, deactivate() sets state.active to false. The panel can be drawn to the display with the draw() method.
     """
 
-    _control = None
+    _control = {
+        'types': _set(['control_select', 'control_toggle',
+                       'function_select', 'function_toggle',
+                       'label', 'textbox']),
+        'linkable': _set(['function_select', 'function_toggle']),
+        'scrollable': _set(['control_select', 'function_select',
+                            'textbox']),
+        'control_select': Control,
+        'control_toggle': Control,
+        'function_select': FunctionControl,
+        'function_toggle': FunctionControl,
+        'label': Label,
+        'textbox': Textbox}
     _image_default = None
     _image_source = None
     _clipboard = None
@@ -274,8 +286,6 @@ class Interface(engine.sprite.Sprite):
             else:
                 _touchevt.interfaces.append(self)
             self.touchactive = False
-        if Interface._control is None:
-            self._initiate()
         self.add_controls()
         self.activate()
 
@@ -316,21 +326,6 @@ class Interface(engine.sprite.Sprite):
         self._control_press['control'] = None
         self._panel_disabled = True
         self.panel_update()
-
-    def _initiate(self):
-        Interface._control = {
-            'types': _set(['control_select', 'control_toggle',
-                           'function_select', 'function_toggle',
-                           'label', 'textbox']),
-            'linkable': _set(['function_select', 'function_toggle']),
-            'scrollable': _set(['control_select', 'function_select',
-                                'textbox']),
-            'control_select': Control,
-            'control_toggle': Control,
-            'function_select': FunctionControl,
-            'function_toggle': FunctionControl,
-            'label': Label,
-            'textbox': Textbox}
 
     def _force_update(self):
         if self._initial_update:
