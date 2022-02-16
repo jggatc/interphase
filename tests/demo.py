@@ -29,7 +29,13 @@ class InterfaceDemo(interphase.Interface):
 
     def __init__(self):
         self.screen, self.background, self.clock = self.initiate()
-        interphase.Interface.__init__(self, position=(self.screen.get_width()//2,self.screen.get_height()-50), color=(43,50,58), size=(350,100), moveable=False, position_offset=(0,95), control_minsize=(25,25), control_size='auto', font_color=(175,180,185), tips_fontcolor=(175,180,185), scroll_button='both')
+        w = self.screen.get_width() // 2
+        h = self.screen.get_height() - 50
+        interphase.Interface.__init__(
+            self, position=(w,h), color=(43,50,58), size=(350,100),
+            moveable=False, position_offset=(0,95), control_minsize=(25,25),
+            control_size='auto', font_color=(175,180,185),
+            tips_fontcolor=(175,180,185), scroll_button='both')
         self.puzzle = False
         self.puzzle_init = False
         self.puzzle_panel = None
@@ -42,9 +48,16 @@ class InterfaceDemo(interphase.Interface):
 
     def add_controls(self):
         """Add interface controls."""
-        Control_list = ['Intro Textbox', 'Control 1', 'Control 2', 'Layout', 'Puzzle', 'Doc', 'Exit']
-        Control_tip = ['Interphase Intro', 'Control Panel 1', 'Control Panel 2', 'Control Placement', 'Sliding Control', 'Interphase Doc', 'Click to Exit']
-        Control_link = [ ['Interphase'], ['Select1'], ['Setting1', 'Setting2', 'Files'], ['Moveable'],['Puzzle'], ['Doc'] , ['Interphase_url']]
+        Control_list = [
+            'Intro Textbox', 'Control 1', 'Control 2',
+            'Layout', 'Puzzle', 'Doc', 'Exit']
+        Control_tip = [
+            'Interphase Intro', 'Control Panel 1', 'Control Panel 2',
+            'Control Placement', 'Sliding Control', 'Interphase Doc',
+            'Click to Exit']
+        Control_link = [
+            ['Interphase'], ['Select1'], ['Setting1', 'Setting2', 'Files'],
+            ['Moveable'],['Puzzle'], ['Doc'] , ['Interphase_url']]
         self.add(
             identity = 'Control',
             control_type = 'function_select',
@@ -196,7 +209,8 @@ class InterfaceDemo(interphase.Interface):
         terminate = False
         for event in engine.event.get():
             if event.type == interphase.EVENT['controlselect']:
-                if event.state.control == 'Control' and event.state.button == 'Control':
+                if (event.state.control == 'Control' and
+                    event.state.button == 'Control'):
                     if event.state.value == 'Exit':
                         terminate = True
             elif event.type == engine.KEYDOWN:
@@ -256,12 +270,16 @@ class InterfaceDemo(interphase.Interface):
             elif state.control == 'Moveable':
                 self.set_control_moveable()
                 if self.is_control_moveable():
-                    self.set_control_move(state.control, mouse_visible=False)
-                    self.disable_control('Control', '__Fix', '__Link', '__Help')
+                    self.set_control_move(state.control,
+                                          mouse_visible=False)
+                    self.disable_control('Control', '__Fix',
+                                         '__Link', '__Help')
                 else:
-                    state.controls[self.get_control_move()].set_tip(['Moveable Control'])
+                    state.controls[self.get_control_move()].set_tip(
+                        ['Moveable Control'])
                     self.set_control_move(None)
-                    self.enable_control('Control', '__Fix', '__Link', '__Help')
+                    self.enable_control('Control', '__Fix',
+                                        '__Link', '__Help')
             elif state.control == 'Puzzle':
                 if not self.puzzle:
                     self.puzzle = True
@@ -272,7 +290,9 @@ class InterfaceDemo(interphase.Interface):
                     self.puzzle_init = False
                     self.puzzle = False
                     state.controls['Control'].set_active(True)
-                    rect = self.screen.blit(self.background, (0,0), (0,0,self.screen.get_width(),self.screen.get_height()-100))
+                    rect = self.screen.blit(self.background, (0,0),
+                                            (0,0,self.screen.get_width(),
+                                             self.screen.get_height()-100))
                     self.update_rect.append(rect)
             elif state.control == '__Help':
                 self.set_info_display()
@@ -294,7 +314,9 @@ class InterfaceDemo(interphase.Interface):
                         self.doc_panel = None
                         self.doc_init = False
                         self.doc_browse = False
-                        rect = self.screen.blit(self.background, (0,0), (0,0,self.screen.get_width(),self.screen.get_height()-100))
+                        rect = self.screen.blit(self.background, (0,0),
+                                                (0,0,self.screen.get_width(),
+                                                 self.screen.get_height()-100))
                         self.update_rect.append(rect)
             elif state.control == 'Control':
                 if self.doc_browse:
@@ -304,7 +326,9 @@ class InterfaceDemo(interphase.Interface):
                     self.doc_panel = None
                     self.doc_init = False
                     self.doc_browse = False
-                    rect = self.screen.blit(self.background, (0,0), (0,0,self.screen.get_width(),self.screen.get_height()-100))
+                    rect = self.screen.blit(self.background, (0,0),
+                                            (0,0,self.screen.get_width(),
+                                             self.screen.get_height()-100))
                     self.update_rect.append(rect)
         if self.is_control_moveable():
             self.move_control()
@@ -314,7 +338,8 @@ class InterfaceDemo(interphase.Interface):
         if self.puzzle:
             if not self.puzzle_init:
                 self.puzzle_interface = InterfacePuzzle(self.screen)
-                self.puzzle_panel = engine.sprite.RenderUpdates(self.puzzle_interface)
+                self.puzzle_panel = engine.sprite.RenderUpdates(
+                    self.puzzle_interface)
                 if state.values['Select1'] == 'OFF':
                     self.puzzle_interface.set_control_image('none')
                     self.puzzle_interface.panel_update()
@@ -326,7 +351,8 @@ class InterfaceDemo(interphase.Interface):
         if self.doc_browse:
             if not self.doc_init:
                 self.doc_interface = InterfaceDoc(self.screen)
-                self.doc_panel = engine.sprite.RenderUpdates(self.doc_interface)
+                self.doc_panel = engine.sprite.RenderUpdates(
+                    self.doc_interface)
                 if state.values['Select1'] == 'OFF':
                     self.doc_interface.set_control_image('none')
                     self.doc_interface.set_button_image('none')
@@ -338,7 +364,9 @@ class InterfaceDemo(interphase.Interface):
         if self.is_info_display():
             if state.control_interact:
                 self.add_info(state.control_interact, ':')
-                self.add_info(' '.join(str(state.values[state.control_interact]).split()[0:2]))
+                self.add_info(
+                    ' '.join(str(state.values[state.control_interact])
+                    .split()[0:2]))
                 if state.button:
                     self.add_info(state.button)
             if self.puzzle and self.puzzle_interface.is_active():
@@ -349,7 +377,8 @@ class InterfaceDemo(interphase.Interface):
                 mouse_x, mouse_y = self.get_pointer_position()
                 x, y = self.get_position()
                 size = self.get_size()
-                pos = mouse_x - x + (size[0]//2), mouse_y - y + (size[1]//2)
+                pos = (mouse_x - x + (size[0]//2),
+                       mouse_y - y + (size[1]//2))
                 state.controls['__Position'].set_value(pos)
             else:
                 if state.controls['__Position'].get_value():
@@ -367,7 +396,11 @@ class InterfaceDoc(interphase.Interface):
 
     def __init__(self, display):
         w, h = display.get_size()
-        interphase.Interface.__init__(self, identity='Interface_Doc', position=(0.5,(h//2)-50), color=(43,50,58), image='none', size=(int(w*0.94),int(h*0.55)), screen=(w,h), font_color=(175,180,185), tips_display=False, scroll_button='vertical')
+        interphase.Interface.__init__(
+            self, identity='Interface_Doc', position=(0.5,(h//2)-50),
+            color=(43,50,58), image='none', size=(int(w*0.94),int(h*0.55)),
+            screen=(w,h), font_color=(175,180,185), tips_display=False,
+            scroll_button='vertical')
         self.textbox = self.get_control('Doc')
         self.textbox.set_value(self.generate_doc())
         self.page_lines = self.textbox.get_line_max()
@@ -381,7 +414,7 @@ class InterfaceDoc(interphase.Interface):
             identity = 'Doc',
             control_type = 'textbox',
             position = (0.5,0.5),
-            size = (self.get_size()[0]-34,self.get_size()[1]-34),
+            size = (self.get_size()[0] - 34, self.get_size()[1] - 34),
             color = (19,22,26),
             font_color = (150,150,150),
             font_size = 12,
@@ -398,7 +431,8 @@ class InterfaceDoc(interphase.Interface):
         else:
             f.close()
         if not doc:
-            doc = module_info+'\n\nDocumentation in guide.txt unable to be accessed.'
+            msg = '\n\nDocumentation in guide.txt unable to be accessed.'
+            doc = module_info + msg
         return doc
 
     def browse(self, control, value=None):
@@ -427,17 +461,22 @@ class InterfacePuzzle(interphase.Interface):
     def __init__(self, display):
         self.puzzle_initiate()
         w, h = display.get_size()
-        interphase.Interface.__init__(self, identity='Interface_Puzzle', position=(0.5,(h//2)-50), color=(23,30,38), size=(180,180), screen=(w,h), font_color=(175,180,185), tips_fontcolor=(255,255,255))
+        interphase.Interface.__init__(
+            self, identity='Interface_Puzzle', position=(0.5,(h//2)-50),
+            color=(23,30,38), size=(180,180), screen=(w,h),
+            font_color=(175,180,185), tips_fontcolor=(255,255,255))
         self.puzzle_outline()
 
     def add_controls(self):
         """Add interface controls."""
-        positions = [pos for pos in self.grid_positions if pos != self.grid_blank]
+        positions = [pos for pos in self.grid_positions
+                     if pos != self.grid_blank]
         for index, pos in enumerate(positions):
             self.add(
                 identity = str(index+1),
                 control_type = 'control_toggle',
-                position = ((pos[0]*self.grid_size[0])+self.grid_xy[0], (pos[1]*self.grid_size[1])+self.grid_xy[1]),
+                position = ((pos[0] * self.grid_size[0]) + self.grid_xy[0],
+                            (pos[1] * self.grid_size[1]) + self.grid_xy[1]),
                 size = self.grid_size,
                 color = (14,20,27),
                 fill = 2,
@@ -466,7 +505,7 @@ class InterfacePuzzle(interphase.Interface):
         self.control_move = None
         self.move_offset = None
         self.move_steps = 2
-        self.move_rate = self.grid_size[0]//self.move_steps
+        self.move_rate = self.grid_size[0] // self.move_steps
         self.move_step = 0
         self.last_move = None
         self.count = 0
@@ -488,12 +527,21 @@ class InterfacePuzzle(interphase.Interface):
             ids.remove(self.last_move)
         random.shuffle(ids)
         for id in ids:
-            pos = (ctrl[id].position[0]-self.grid_xy[0]+(ctrl[id].size[0]//2))//ctrl[id].size[0], (ctrl[id].position[1]-self.grid_xy[1]+(ctrl[id].size[1]//2))//ctrl[id].size[1]
-            if (pos[0] == self.grid_blank[0] and abs(pos[1]-self.grid_blank[1]) == 1) or (pos[1] == self.grid_blank[1] and abs(pos[0]-self.grid_blank[0]) == 1):
+            pos = ((ctrl[id].position[0] - self.grid_xy[0]
+                   + (ctrl[id].size[0]//2)) // ctrl[id].size[0],
+                  (ctrl[id].position[1] - self.grid_xy[1]
+                   + (ctrl[id].size[1]//2)) // ctrl[id].size[1])
+            if ((pos[0] == self.grid_blank[0] and
+                abs(pos[1]-self.grid_blank[1]) == 1) or
+               (pos[1] == self.grid_blank[1] and
+                abs(pos[0]-self.grid_blank[0]) == 1)):
                 break
         self.last_move = id
         self.control_move = id
-        self.move_offset = (self.grid_blank[0]*self.move_rate - pos[0]*self.move_rate, self.grid_blank[1]*self.move_rate - pos[1]*self.move_rate)
+        self.move_offset = (self.grid_blank[0] * self.move_rate
+                            - pos[0] * self.move_rate,
+                            self.grid_blank[1] * self.move_rate
+                            - pos[1] * self.move_rate)
         self.grid_blank = pos
         self.count += 1
         if self.count > 100 and self.grid_blank == (3,3):
@@ -505,9 +553,18 @@ class InterfacePuzzle(interphase.Interface):
     def puzzle(self, state):
         """Slide puzzle controls."""
         ctrl = self.get_control(state.control)
-        pos = (ctrl.position[0]-self.grid_xy[0]+(ctrl.size[0]//2))//ctrl.size[0], (ctrl.position[1]-self.grid_xy[1]+(ctrl.size[1]//2))//ctrl.size[1]
-        if (pos[0] == self.grid_blank[0] and abs(pos[1]-self.grid_blank[1]) == 1) or (pos[1] == self.grid_blank[1] and abs(pos[0]-self.grid_blank[0]) == 1):
-            self.move_offset = (self.grid_blank[0]*self.move_rate - pos[0]*self.move_rate, self.grid_blank[1]*self.move_rate - pos[1]*self.move_rate)
+        pos = ((ctrl.position[0] - self.grid_xy[0]
+               + (ctrl.size[0]//2)) // ctrl.size[0],
+              (ctrl.position[1] - self.grid_xy[1]
+               + (ctrl.size[1]//2)) // ctrl.size[1])
+        if ((pos[0] == self.grid_blank[0] and
+             abs(pos[1]-self.grid_blank[1]) == 1) or
+            (pos[1] == self.grid_blank[1] and
+             abs(pos[0]-self.grid_blank[0]) == 1)):
+            self.move_offset = (self.grid_blank[0] * self.move_rate
+                                - pos[0] * self.move_rate,
+                                self.grid_blank[1] * self.move_rate
+                                - pos[1] * self.move_rate)
             self.control_move = state.control
             self.grid_blank = pos
 
@@ -516,7 +573,10 @@ class InterfacePuzzle(interphase.Interface):
         controls = self.get_control()
         success = True
         for id in self.grid_id:
-            pos = (controls[id].position[0]-self.grid_xy[0]+(controls[id].size[0]//2))//controls[id].size[0], (controls[id].position[1]-self.grid_xy[1]+(controls[id].size[1]//2))//controls[id].size[1]
+            pos = ((controls[id].position[0] - self.grid_xy[0]
+                    + (controls[id].size[0]//2)) // controls[id].size[0],
+                   (controls[id].position[1] - self.grid_xy[1]
+                    + (controls[id].size[1]//2)) // controls[id].size[1])
             if controls[id].value != self.grid[pos]:
                 success = False
                 break
@@ -525,7 +585,8 @@ class InterfacePuzzle(interphase.Interface):
     def move(self):
         """Puzzle control move."""
         if self.move_step < self.move_steps:
-            self.move_control(self.control_move, offset=self.move_offset)
+            self.move_control(self.control_move,
+                              offset=self.move_offset)
             self.move_step += 1
             complete = False
         else:
@@ -557,7 +618,8 @@ class InterfacePuzzle(interphase.Interface):
                     success = self.puzzle_final()
                     if success:
                         self.puzzle_solving = False
-                        time = ( engine.time.get_ticks() - self.grid_timer ) // 1000
+                        time = ((engine.time.get_ticks()
+                                 - self.grid_timer) // 1000)
                         control_start = self.get_control('Start')
                         control_start.set_value(str(time)+'s')
                         control_start.set_active(True)
@@ -581,7 +643,7 @@ def run():
         if panel.is_active():
             if panel.is_update():
                 panel.clear(panel.screen,panel.background)
-                panel.update_rect.extend( panel.draw(panel.screen) )
+                panel.update_rect.extend(panel.draw(panel.screen))
             if panel.update_rect:
                 engine.display.update(panel.update_rect)
                 panel.update_rect = []
