@@ -19,13 +19,10 @@ import interphase
 interphase.init(engine)
 
 
-module_info = """Interphase Module\n\nThe module adds interface panel functionality to a Pygame application. It was developed as a simple GUI with the goal to simulate a digital display panel. The module provides interface and control objects to design a panel, with methods to manage the panel from the application code."""
+module_info = "Interphase Module\n\nThe module adds interface panel functionality to a Pygame application. It was developed as a simple GUI with the goal to simulate a digital display panel. The module provides interface and control objects to design a panel, with methods to manage the panel from the application code."
 
 
 class InterfaceDemo(interphase.Interface):
-    """
-    Interphase interface.
-    """
 
     def __init__(self):
         self.screen, self.background, self.clock = self.initiate()
@@ -47,7 +44,7 @@ class InterfaceDemo(interphase.Interface):
         self.update_rect = []
 
     def add_controls(self):
-        """Add interface controls."""
+        "Add interface controls"
         Control_list = [
             'Intro Textbox', 'Control 1', 'Control 2',
             'Layout', 'Puzzle', 'Doc', 'Exit']
@@ -196,7 +193,7 @@ class InterfaceDemo(interphase.Interface):
         self.get_control('Interphase_url').add_action(self.launch_url)
 
     def initiate(self):
-        """Initiate demo."""
+        "Initiate demo"
         engine.display.set_caption('Interphase')
         screen = engine.display.get_surface()
         background = engine.Surface(screen.get_size())
@@ -205,7 +202,7 @@ class InterfaceDemo(interphase.Interface):
         return screen, background, clock
 
     def event_check(self):
-        """Check user input."""
+        "Check user input"
         terminate = False
         for event in engine.event.get():
             if event.type == interphase.EVENT['controlselect']:
@@ -222,13 +219,13 @@ class InterfaceDemo(interphase.Interface):
         return terminate
 
     def doc_control(self, control, value):
-        """Documentation browse control."""
+        "Documentation browse control"
         if control in ['Next', 'Previous']:
             if self.doc_browse:
                 self.doc_interface.browse(control)
 
     def launch_url(self, control=None, value=None):
-        """Launch module webpage."""
+        "Launch module webpage"
         try:
             import webbrowser
             webbrowser.open(value.split()[1])
@@ -390,9 +387,6 @@ class InterfaceDemo(interphase.Interface):
 
 
 class InterfaceDoc(interphase.Interface):
-    """
-    Documentation interface.
-    """
 
     def __init__(self, display):
         w, h = display.get_size()
@@ -409,7 +403,7 @@ class InterfaceDoc(interphase.Interface):
         self.prev_move = 0
 
     def add_controls(self):
-        """Add interface controls."""
+        "Add interface controls"
         self.add(
             identity = 'Doc',
             control_type = 'textbox',
@@ -422,7 +416,7 @@ class InterfaceDoc(interphase.Interface):
             label_display = False)
 
     def generate_doc(self):
-        """Retrieve documentation."""
+        "Retrieve documentation"
         try:
             f = open(os.path.join('docs', 'guide.txt'), 'r')
             doc = f.read()
@@ -436,14 +430,14 @@ class InterfaceDoc(interphase.Interface):
         return doc
 
     def browse(self, control, value=None):
-        """Documentation browse control."""
+        "Documentation browse control"
         if control == 'Next':
             self.next_move = self.page_lines
         elif control == 'Previous':
             self.prev_move = self.page_lines
 
     def update(self):
-        """Documentation interface update."""
+        "Documentation interface update"
         interphase.Interface.update(self)
         if self.next_move:
             self.textbox.next(self.line_step)
@@ -454,9 +448,6 @@ class InterfaceDoc(interphase.Interface):
 
 
 class InterfacePuzzle(interphase.Interface):
-    """
-    Puzzle interface.
-    """
 
     def __init__(self, display):
         self.puzzle_initiate()
@@ -468,7 +459,7 @@ class InterfacePuzzle(interphase.Interface):
         self.puzzle_outline()
 
     def add_controls(self):
-        """Add interface controls."""
+        "Add interface controls"
         positions = [pos for pos in self.grid_positions
                      if pos != self.grid_blank]
         for index, pos in enumerate(positions):
@@ -493,7 +484,7 @@ class InterfacePuzzle(interphase.Interface):
             label_display = False)
 
     def puzzle_initiate(self):
-        """Initiate puzzle."""
+        "Initiate puzzle"
         self.grid_positions = [(y,x) for x in range(4) for y in range(4)]
         self.grid = {}
         for index, pos in enumerate(self.grid_positions):
@@ -514,12 +505,12 @@ class InterfacePuzzle(interphase.Interface):
         self.puzzle_solving = False
 
     def puzzle_outline(self):
-        """Draw outline around puzzle controls."""
+        "Draw outline around puzzle controls"
         panel_image = self.get_panel_image(change=True)
         engine.draw.rect(panel_image, (14,20,27), (10,10,160,160), 2)
 
     def init(self):
-        """Shuffle puzzle controls."""
+        "Shuffle puzzle controls"
         ctrl = self.get_control()
         next = {}
         ids = self.grid_id[:]
@@ -551,7 +542,7 @@ class InterfacePuzzle(interphase.Interface):
             return False
 
     def puzzle(self, state):
-        """Slide puzzle controls."""
+        "Slide puzzle controls"
         ctrl = self.get_control(state.control)
         pos = ((ctrl.position[0] - self.grid_xy[0]
                + (ctrl.size[0]//2)) // ctrl.size[0],
@@ -569,7 +560,7 @@ class InterfacePuzzle(interphase.Interface):
             self.grid_blank = pos
 
     def puzzle_final(self):
-        """Check if puzzle is complete."""
+        "Check if puzzle is complete"
         controls = self.get_control()
         success = True
         for id in self.grid_id:
@@ -583,7 +574,7 @@ class InterfacePuzzle(interphase.Interface):
         return success
 
     def move(self):
-        """Puzzle control move."""
+        "Puzzle control move"
         if self.move_step < self.move_steps:
             self.move_control(self.control_move,
                               offset=self.move_offset)
@@ -596,7 +587,7 @@ class InterfacePuzzle(interphase.Interface):
         return complete
 
     def update(self):
-        """Puzzle update."""
+        "Puzzle update"
         interphase.Interface.update(self)
         state = self.get_state()
         if state.control == 'Start':
