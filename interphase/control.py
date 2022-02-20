@@ -1098,10 +1098,10 @@ class Control(object):
         else:
             return False
 
-    def set_link_activated(self, setting='Toggle'):
+    def set_link_activated(self, setting=None):
         """Set whether linked control active immediately or upon control button activation."""
         link_change = False
-        if setting == 'Toggle':
+        if setting is None:
             self.link_activated = not self.link_activated
             link_change = True
         elif setting in (True, False):
@@ -1168,10 +1168,10 @@ class Control(object):
         """Check whether control is activated."""
         return self.activated
 
-    def set_activated(self, setting='Toggle'):
+    def set_activated(self, setting=None):
         """Set control activated."""
         change = False
-        if setting == 'Toggle':
+        if setting is None:
             self.activated = not self.activated
             change = True
         elif setting in (True, False):
@@ -1194,9 +1194,9 @@ class Control(object):
         """Check control activate lock."""
         return self.activated_lock
 
-    def set_activated_lock(self, setting='Toggle'):
+    def set_activated_lock(self, setting=None):
         """Set control activate lock."""
-        if setting == 'Toggle':
+        if setting is None:
             self.activated_lock = not self.activated_lock
         elif setting in (True, False):
             self.activated_lock = setting
@@ -1274,9 +1274,9 @@ class Control(object):
         """Check whether a control is active."""
         return self.active
 
-    def set_active(self, setting='Toggle'):
+    def set_active(self, setting=None):
         """Set control active setting."""
-        if setting == 'Toggle':
+        if setting is None:
             self.active = not self.active
             self.panel._update_panel = True
             return self.active
@@ -1291,9 +1291,9 @@ class Control(object):
         """Check whether control is enabled."""
         return self.enabled
 
-    def set_enabled(self, setting='Toggle'):
+    def set_enabled(self, setting=None):
         """Set control enabled setting."""
-        if setting == 'Toggle':
+        if setting is None:
             if not self.enabled:
                 self.panel.enable_control(self.id)
             else:

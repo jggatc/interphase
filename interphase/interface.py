@@ -792,14 +792,14 @@ class Interface(engine.sprite.Sprite):
         elif setting == 'Fixed':
             return self._display_fixed
 
-    def set_moveable(self, setting='Toggle',
+    def set_moveable(self, setting=None,
                      position_offset=None, move_rate=None):
         """Set panel moveable setting."""
         if position_offset:
             self._offsetx, self._offsety = position_offset
         if move_rate:
             self._move_ratex, self._move_ratey = move_rate
-        if setting == 'Toggle':
+        if setting is None:
             self._moveable = not self._moveable
             return self._moveable
         elif setting in (True, False):
@@ -828,9 +828,9 @@ class Interface(engine.sprite.Sprite):
         """Check whether panel controls displayed or toggled with pointer interaction."""
         return self._panel_display
 
-    def set_panel_display(self, setting='Toggle'):
+    def set_panel_display(self, setting=None):
         """Set panel controls displayed or toggled with pointer interaction."""
-        if setting == 'Toggle':
+        if setting is None:
             self._panel_display = not self._panel_display
             self._panel_active = True
             return self._panel_display
@@ -845,9 +845,9 @@ class Interface(engine.sprite.Sprite):
         """Check whether info is displayed."""
         return self._info_display
 
-    def set_info_display(self, setting='Toggle'):
+    def set_info_display(self, setting=None):
         """Set info display setting."""
-        if setting == 'Toggle':
+        if setting is None:
             self._info_display = not self._info_display
             return self._info_display
         elif setting in (True, False):
@@ -860,9 +860,9 @@ class Interface(engine.sprite.Sprite):
         """Check whether label is displayed."""
         return self._label_display
 
-    def set_label_display(self, setting='Toggle'):
+    def set_label_display(self, setting=None):
         """Set label display setting."""
-        if setting == 'Toggle':
+        if setting is None:
             self._label_display = not self._label_display
             self._update_panel = True
             return self._label_display
@@ -877,9 +877,9 @@ class Interface(engine.sprite.Sprite):
         """Check whether tips are displayed."""
         return self._tips_display
 
-    def set_tips_display(self, setting='Toggle'):
+    def set_tips_display(self, setting=None):
         """Set tips display setting."""
-        if setting == 'Toggle':
+        if setting is None:
             self._tips_display = not self._tips_display
             return self._tips_display
         elif setting in (True, False):
@@ -937,9 +937,9 @@ class Interface(engine.sprite.Sprite):
         """Get position of pointer determined at latest update."""
         return self._pointer_position
 
-    def set_pointer_interact(self, setting='Toggle'):
+    def set_pointer_interact(self, setting=None):
         """Set pointer interact monitoring."""
-        if setting == 'Toggle':
+        if setting is None:
             self._pointer_interact = not self._pointer_interact
             return self._pointer_interact
         elif setting in (True, False):
@@ -1045,9 +1045,9 @@ class Interface(engine.sprite.Sprite):
         """Check whether control is moveable."""
         return self._control_moveable
 
-    def set_control_moveable(self, setting='Toggle'):
+    def set_control_moveable(self, setting=None):
         """Set control moveable."""
-        if setting == 'Toggle':
+        if setting is None:
             self._control_moveable = not self._control_moveable
             return self._control_moveable
         elif setting in (True, False):
