@@ -393,8 +393,7 @@ class InterfaceDoc(interphase.Interface):
         interphase.Interface.__init__(
             self, identity='Interface_Doc', position=(0.5,(h//2)-50),
             color=(43,50,58), image='none', size=(int(w*0.94),int(h*0.55)),
-            screen=(w,h), font_color=(175,180,185), tips_display=False,
-            scroll_button='vertical')
+            screen=(w,h), font_color=(175,180,185), scroll_button='vertical')
         self.textbox = self.get_control('Doc')
         self.textbox.set_value(self.generate_doc())
         self.page_lines = self.textbox.get_line_max()
@@ -455,7 +454,7 @@ class InterfacePuzzle(interphase.Interface):
         interphase.Interface.__init__(
             self, identity='Interface_Puzzle', position=(0.5,(h//2)-50),
             color=(23,30,38), size=(180,180), screen=(w,h),
-            font_color=(175,180,185), tips_fontcolor=(255,255,255))
+            font_color=(175,180,185))
         self.puzzle_outline()
 
     def add_controls(self):
@@ -512,11 +511,21 @@ class InterfacePuzzle(interphase.Interface):
     def init(self):
         "Shuffle puzzle controls"
         ctrl = self.get_control()
-        next = {}
         ids = self.grid_id[:]
         if self.last_move:
             ids.remove(self.last_move)
         random.shuffle(ids)
+        for id in ids:
+            pos = ((ctrl[id].position[0] - self.grid_xy[0]
+                    + (ctrl[id].size[0]//2)) // ctrl[id].size[0],
+                   (ctrl[id].position[1] - self.grid_xy[1]
+                    + (ctrl[id].size[1]//2)) // ctrl[id].size[1])
+            if ((pos[0] == self.grid_blank[0] and
+                abs(pos[1]-self.grid_blank[1]) == 1) or
+                (pos[1] == self.grid_blank[1] and
+                abs(pos[0]-self.grid_blank[0]) == 1)):
+                break
+
         for id in ids:
             pos = ((ctrl[id].position[0] - self.grid_xy[0]
                    + (ctrl[id].size[0]//2)) // ctrl[id].size[0],
@@ -545,9 +554,9 @@ class InterfacePuzzle(interphase.Interface):
         "Slide puzzle controls"
         ctrl = self.get_control(state.control)
         pos = ((ctrl.position[0] - self.grid_xy[0]
-               + (ctrl.size[0]//2)) // ctrl.size[0],
-              (ctrl.position[1] - self.grid_xy[1]
-               + (ctrl.size[1]//2)) // ctrl.size[1])
+                + (ctrl.size[0]//2)) // ctrl.size[0],
+               (ctrl.position[1] - self.grid_xy[1]
+                + (ctrl.size[1]//2)) // ctrl.size[1])
         if ((pos[0] == self.grid_blank[0] and
              abs(pos[1]-self.grid_blank[1]) == 1) or
             (pos[1] == self.grid_blank[1] and
