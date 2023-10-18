@@ -1,3 +1,8 @@
+0.88_dev
+-minor change with colorkey parameter.
+-revise control event instantiation.
+-revise control userevents.
+
 0.88    2019-04-06
 -update interface to address issue in move method when get_fps return zero.
 -add interface.is_panel_display to check panel controls displayed.

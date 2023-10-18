@@ -17,7 +17,8 @@ __docformat__ = 'restructuredtext'
 """
 :undocumented:EVENT
 """
-EVENT = {'controlselect': 30, 'controlinteract': 31}
+EVENT = {'controlselect': engine.NUMEVENTS-2,
+         'controlinteract': engine.NUMEVENTS-1}
 
 
 class Interface(engine.sprite.Sprite):
