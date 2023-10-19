@@ -423,16 +423,6 @@ def load_image(filename, frames=1, path='data', zipobj=None,
     Load image from file.
     Arguments include the image filename, the number of image frames in an image strip, the image path, zipobj for image in a zip file, fileobj for image in a file-like object, image colorkey, and errorhandle for exception handling.
     """
-    def convert_image(image, colorkey):
-        if image.get_alpha():
-            image = image.convert_alpha()
-        else:
-            image = image.convert()
-        if colorkey is not None:
-            if colorkey == -1:
-                colorkey = image.get_at((0,0))
-            image.set_colorkey(colorkey, engine.RLEACCEL)
-        return image
     if zipobj:
         import zipfile
         try:
@@ -463,7 +453,10 @@ def load_image(filename, frames=1, path='data', zipobj=None,
     try:
         if frames == 1:
             image = engine.image.load(full_name, namehint)
-            image = convert_image(image, colorkey)
+            if colorkey is not None:
+                if colorkey == -1:
+                    colorkey = image.get_at((0,0))
+                image.set_colorkey(colorkey, engine.RLEACCEL)
             return image
         elif frames > 1:
             images = []
@@ -474,8 +467,10 @@ def load_image(filename, frames=1, path='data', zipobj=None,
                 frame_num = width * frame
                 image_frame = image.subsurface(
                     (frame_num, 0, width, height)).copy()
-                image_frame.set_alpha(image.get_alpha())
-                image_frame = convert_image(image_frame, colorkey)
+                if colorkey is not None:
+                    if colorkey == -1:
+                        colorkey = image_frame.get_at((0,0))
+                    image_frame.set_colorkey(colorkey, engine.RLEACCEL)
                 images.append(image_frame)
             return images
     except engine.error:
