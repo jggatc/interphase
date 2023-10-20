@@ -18,9 +18,8 @@
 #LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
-#
-#Interphase version 0.88
-#Project Site: https://gatc.ca/
+
+__version__ = '0.88'
 
 try:
     import pygame as engine
@@ -39,13 +38,14 @@ def get_init():
 
 
 def _init(engine):
-    global Interface, EVENT, Control, FunctionControl, Label, Textbox, Text, load_image, __version__, initialized
+    global Interface, EVENT, Control, FunctionControl, Label, Textbox, Text, load_image, version, initialized
     from interphase import env
     env.engine = engine
     from interphase.interface import Interface, EVENT
     from interphase.control import Control, FunctionControl, Label, Textbox
     from interphase.util import Text, load_image
-    from interphase.version import __version__
+    from interphase import version
+    version.set_ver(__version__)
     initialized = True
 
 
