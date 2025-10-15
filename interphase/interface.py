@@ -421,6 +421,10 @@ class Interface(engine.sprite.Sprite):
         """Retrieve panel size."""
         return self._size
 
+    def get_rect(self):
+        """Retrieve panel rect."""
+        return self.image.get_rect(center=(self._x, self._y))
+
     def _zip_file(self, zip_file=None, close=False):
         """Retrieve zipfile object."""
         import zipfile
@@ -1125,7 +1129,7 @@ class Interface(engine.sprite.Sprite):
                         if self._control_hover:
                             ctl = self._controls[self._control_hover]
                             if len(ctl.tips) == 1:
-                                tip = ctl.tips[ctl.tips.keys()[0]]
+                                tip = next(iter(ctl.tips.values()))
                             else:
                                 tip = ctl.tips[ctl.value]
                             pos = (x - (self._x-(self._size[0]//2)),

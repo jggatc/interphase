@@ -3,6 +3,8 @@
 -revise control event instantiation.
 -revise control userevents.
 -revise image load.
+-revise tips display.
+-add panel get_rect.
 
 0.88    2019-04-06
 -update interface to address issue in move method when get_fps return zero.
