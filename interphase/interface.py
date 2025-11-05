@@ -217,6 +217,8 @@ class Interface(engine.sprite.Sprite):
                 self._scroll_button = _set([4, 5, 6, 7])
         else:
             self._scroll_button = None
+        self._scroll_button_y = {1:4, -1:5}    ###
+        self._scroll_button_x = {-1:6, 1:7}    ###
         self._scroll_button_selected = {4: '_top',
                                         5: '_bottom',
                                         6: '_top',
@@ -968,7 +970,7 @@ class Interface(engine.sprite.Sprite):
     def get_event_queue(self):
         """
         Return interface event queue.
-        Event queue has mouse press events sequestered upon panel interaction with scroll_button active.
+        Event queue has mousewheel events sequestered upon panel interaction with scroll_button active.
         """
         return self._event_queue
 
@@ -1321,12 +1323,16 @@ class Interface(engine.sprite.Sprite):
             if self._scroll_button is None:
                 return None, None
             else:
-                self._event_queue[:] = engine.event.get(engine.MOUSEBUTTONDOWN)
+                self._event_queue[:] = engine.event.get(engine.MOUSEWHEEL)
                 scroll_event = None
                 for event in self._event_queue:
-                    if event.button in self._scroll_button:
+                    if event.y:    ###
+                        button = self._scroll_button_y[event.y]
+                    else:
+                        button = self._scroll_button_x[event.x]
+                    if button in self._scroll_button:
                         if not scroll_event:
-                            scroll_event = event.button
+                            scroll_event = button
                         else:
                             self._control_events += 1
                 if scroll_event:
