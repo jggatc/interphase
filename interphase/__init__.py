@@ -19,7 +19,7 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
 
-__version__ = '0.88'
+__version__ = '0.89'
 
 try:
     import pygame as engine
